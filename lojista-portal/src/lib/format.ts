@@ -1,3 +1,5 @@
+import { SUPABASE_DEMO } from "@/config/supabase.demo";
+
 export function slugify(input: string): string {
   return input
     .toString()
@@ -33,9 +35,7 @@ export function formatPhone(raw: string | null | undefined): string {
 export function publicImage(path: string | null | undefined, fallback?: string): string | undefined {
   if (!path) return fallback;
   if (path.startsWith("http")) return path;
-  // Public URL pattern for Supabase Storage
-  const base = (typeof window !== "undefined" ? "" : "") +
-    (import.meta.env.VITE_SUPABASE_URL ?? "");
+  const base = import.meta.env.VITE_SUPABASE_URL ?? SUPABASE_DEMO.url;
   if (!base) return fallback;
   return `${base}/storage/v1/object/public/lojistas/${path}`;
 }

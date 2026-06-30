@@ -46,21 +46,15 @@ function mirrorSupabaseEnv() {
 }
 
 loadDotEnv(envPath);
+loadDotEnv(outPath);
 mirrorSupabaseEnv();
 
 const onVercel = process.env.VERCEL === "1" || process.env.CI === "true";
 
-if (onVercel) {
-  const missing = [];
-  if (!process.env.VITE_SUPABASE_URL) missing.push("VITE_SUPABASE_URL");
-  if (!process.env.VITE_SUPABASE_PUBLISHABLE_KEY) missing.push("VITE_SUPABASE_PUBLISHABLE_KEY");
-  if (missing.length) {
-    console.error("\n❌ Supabase: configure na Vercel → Settings → Environment Variables:\n");
-    for (const v of missing) console.error(`   • ${v}`);
-    console.error("\n   (Aceita também SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY.)\n");
-    console.error("   Marque Production + Preview → Save → Redeploy.\n");
-    process.exit(1);
-  }
+if (onVercel && (!process.env.VITE_SUPABASE_URL || !process.env.VITE_SUPABASE_PUBLISHABLE_KEY)) {
+  console.warn(
+    "[prepare-build-env] VITE_* ausentes no painel Vercel — usando .env.production do repositório (demo).",
+  );
 }
 
 if (process.env.VITE_SUPABASE_URL && process.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
