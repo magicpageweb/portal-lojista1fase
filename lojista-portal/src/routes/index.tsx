@@ -68,8 +68,7 @@ function Hero() {
           />
         ))}
       </div>
-      {/* parallax blobs */}
-      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/20 blur-3xl animate-pulse-glow" />
+      {/* glow sutil à direita */}
       <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-secondary-glow/30 blur-3xl animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
 
       <div className="container relative z-10 mx-auto grid gap-10 px-4 pb-16 pt-24 md:grid-cols-[minmax(0,1fr)_minmax(0,46%)] md:items-end md:gap-6 md:pb-0 md:pt-28 lg:pt-32">
