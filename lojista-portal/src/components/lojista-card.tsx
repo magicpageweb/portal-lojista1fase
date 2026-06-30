@@ -31,18 +31,20 @@ export function LojistaCard({ lojista }: LojistaCardProps) {
       <div className="flip-card-inner shadow-elegant transition-shadow group-hover:shadow-gold">
         {/* Front */}
         <div className="flip-card-front bg-card">
-          <div className="relative h-40 overflow-hidden">
-            {cap ? (
-              <img src={cap} alt={lojista.nome_fantasia} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-            ) : (
-              <div className="h-full w-full" style={{ background: `linear-gradient(135deg, ${catColor}, var(--secondary))` }} />
-            )}
+          <div className="relative h-40 shrink-0">
+            <div className="absolute inset-0 overflow-hidden">
+              {cap ? (
+                <img src={cap} alt={lojista.nome_fantasia} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              ) : (
+                <div className="h-full w-full" style={{ background: `linear-gradient(135deg, ${catColor}, var(--secondary))` }} />
+              )}
+            </div>
             {lojista.destaque && (
-              <Badge className="absolute right-3 top-3 gradient-gold text-secondary">Destaque</Badge>
+              <Badge className="absolute right-3 top-3 z-20 gradient-gold text-secondary">Destaque</Badge>
             )}
-            <div className="absolute -bottom-6 left-4 grid h-14 w-14 place-items-center overflow-hidden rounded-xl border-4 border-card bg-card shadow-elegant">
+            <div className="absolute bottom-0 left-4 z-10 grid h-14 w-14 translate-y-1/2 place-items-center overflow-hidden rounded-xl border-4 border-card bg-card shadow-elegant">
               {logo ? (
-                <img src={logo} alt="" className="h-full w-full object-cover" loading="lazy" />
+                <img src={logo} alt="" className="h-full w-full object-contain p-1" loading="lazy" />
               ) : (
                 <Store className="h-6 w-6 text-secondary" />
               )}
