@@ -32,10 +32,10 @@ function Home() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <Hero />
-      <Counters />
       <FeaturedStores />
       <CategoriesGrid />
       <CtaJoin />
+      <Counters />
       <SiteFooter />
     </div>
   );
