@@ -43,7 +43,7 @@ export const Route = createFileRoute("/apresentacao")({
       {
         name: "description",
         content:
-          "Veja como é simples cadastrar sua loja e produtos no portal Sindilojas. Demonstração interativa para lojistas.",
+          "Vitrine Digital do Lojista Sindilojas: mais visibilidade para o comércio local, presença no Google e facilidade para clientes encontrarem sua loja.",
       },
     ],
   }),
@@ -232,14 +232,14 @@ function ApresentacaoPage() {
       <section className="gradient-hero py-16 text-secondary-foreground md:py-20">
         <div className="container mx-auto px-4">
           <Badge variant="outline" className="border-primary/40 bg-primary/10 text-primary">
-            Demonstração · Reunião Sindilojas
+            Vitrine Digital do Lojista
           </Badge>
           <h1 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-tight md:text-5xl">
             Cadastrar sua loja no portal é simples e rápido
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-secondary-foreground/85">
-            Veja, na prática, como o lojista preenche a vitrine digital — sem login e sem gravar dados.
-            Ideal para apresentar à diretoria do sindicato.
+            Mais visibilidade para o comércio local, maior presença no Google e facilidade para clientes
+            encontrarem seu negócio — tudo reunido na vitrine digital do Sindilojas.
           </p>
         </div>
       </section>
@@ -302,7 +302,7 @@ function ApresentacaoPage() {
               <h2 className="font-display text-xl font-bold">Perguntas frequentes</h2>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              Respostas objetivas para a apresentação à diretoria.
+              Tire dúvidas sobre como participar e divulgar sua loja no portal.
             </p>
             <Accordion type="single" collapsible className="mt-4 rounded-2xl border border-border bg-card px-4 shadow-elegant">
               {FAQ.map((item, i) => (
@@ -326,7 +326,7 @@ function ApresentacaoPage() {
             <Badge className="border-0 bg-amber-500/15 text-amber-800">Somente demonstração</Badge>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            Visual inspirado no painel real, mais amigável para a reunião. Nada é salvo no banco.
+            Conheça o passo a passo do cadastro de forma ilustrativa. Nada é salvo no banco.
           </p>
 
           {submitted ? (
