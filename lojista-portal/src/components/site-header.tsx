@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, Store, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -15,14 +15,14 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold">
-          <span className="grid h-9 w-9 place-items-center rounded-lg gradient-gold shadow-gold">
-            <Store className="h-5 w-5 text-secondary" />
-          </span>
-          <span className="hidden sm:inline">
-            <span className="text-secondary">Sindi</span>
-            <span className="text-primary">lojas</span>
-          </span>
+        <Link to="/" className="flex shrink-0 items-center" aria-label="Sindilojas — início">
+          <img
+            src="/Sindilojas_Logo_color.webp"
+            alt="Sindilojas"
+            className="h-10 w-auto object-contain"
+            width={160}
+            height={40}
+          />
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map((l) => (

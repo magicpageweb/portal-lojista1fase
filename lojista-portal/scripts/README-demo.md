@@ -5,7 +5,7 @@ Scripts para popular e remover **6 lojas fictícias** de demonstração.
 ## Pré-requisitos
 
 1. Node 20+ instalado
-2. Arquivo `lojista-portal/.env` com:
+2. Arquivo `lojista-portal/.env` (copie de `.env.example`) com:
    - `VITE_SUPABASE_URL` ou `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY` (**não commitar**)
 
@@ -35,6 +35,16 @@ npx tsx scripts/seed-demo-lojistas.ts
 ```
 
 Idempotente: se o `slug` demo já existir, a loja é pulada.
+
+## Atualizar imagens demo (capas, logos e produtos)
+
+Depois do seed, envie as imagens geradas para o Supabase Storage:
+
+```powershell
+npx tsx scripts/upload-demo-images.ts
+```
+
+Arquivos locais em `public/demo/{slug}/capa.png` e `logo.png`.
 
 ## Remover tudo demo
 

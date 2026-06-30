@@ -72,6 +72,11 @@ export function LojistaCard({ lojista }: LojistaCardProps) {
               <p className="mt-2 line-clamp-4 text-sm text-secondary-foreground/80">{lojista.descricao}</p>
             )}
             <div className="mt-auto flex flex-col gap-2">
+              <Button asChild size="sm" className="gradient-gold text-secondary hover:opacity-90">
+                <Link to="/lojistas/$slug" params={{ slug: lojista.slug }}>
+                  Visitar loja <ExternalLink className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
               {lojista.whatsapp && (
                 <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600">
                   <a
@@ -83,11 +88,6 @@ export function LojistaCard({ lojista }: LojistaCardProps) {
                   </a>
                 </Button>
               )}
-              <Button asChild size="sm" className="gradient-gold text-secondary hover:opacity-90">
-                <Link to="/lojistas/$slug" params={{ slug: lojista.slug }}>
-                  Visitar loja <ExternalLink className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
             </div>
           </div>
         </div>

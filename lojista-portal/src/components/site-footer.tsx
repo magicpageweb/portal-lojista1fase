@@ -1,19 +1,20 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Mail, MapPin, Phone, Shield, Store } from "lucide-react";
+import { Facebook, Instagram, Mail, MapPin, Phone, Shield } from "lucide-react";
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-secondary/20 bg-secondary text-secondary-foreground">
       <div className="container mx-auto grid gap-10 px-4 py-14 md:grid-cols-4">
         <div>
-          <div className="flex items-center gap-2 font-display text-lg font-bold">
-            <span className="grid h-9 w-9 place-items-center rounded-lg gradient-gold">
-              <Store className="h-5 w-5 text-secondary" />
-            </span>
-            <span>
-              Sindi<span className="text-primary">lojas</span>
-            </span>
-          </div>
+          <Link to="/" className="inline-flex" aria-label="Sindilojas — início">
+            <img
+              src="/Sindilojas_Logo_branco.png"
+              alt="Sindilojas"
+              className="h-10 w-auto object-contain"
+              width={160}
+              height={40}
+            />
+          </Link>
           <p className="mt-3 text-sm text-secondary-foreground/70">
             Portal oficial do sindicato dos lojistas. Conectamos consumidores ao comércio local.
           </p>

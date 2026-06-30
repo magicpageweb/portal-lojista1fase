@@ -1,0 +1,33 @@
+# --- Segredos e credenciais (nunca commitar) ---
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+whois db supabase.txt
+*.pem
+*.key
+*.p12
+secrets/
+.dev.vars
+
+# --- Artefatos locais / backups ---
+*.zip
+*.7z
+*.rar
+
+# --- Dependências e build ---
+node_modules/
+dist/
+dist-ssr/
+.output/
+.vinxi/
+.tanstack/
+.nitro/
+.vercel/
+
+# --- Logs e cache ---
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
