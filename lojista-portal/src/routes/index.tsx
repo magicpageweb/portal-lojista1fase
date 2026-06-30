@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, MapPin, Search, ShieldCheck, Sparkles, Store, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, MapPin, Search, ShieldCheck, Store, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -75,7 +75,7 @@ function Hero() {
       <div className="container relative z-10 mx-auto grid gap-10 px-4 pb-16 pt-24 md:grid-cols-[minmax(0,1fr)_minmax(0,46%)] md:items-end md:gap-6 md:pb-0 md:pt-28 lg:pt-32">
         <div className="flex flex-col justify-center animate-fade-up md:pb-20 lg:pb-24">
           <Badge variant="outline" className="w-fit border-primary/40 bg-primary/10 text-primary">
-            <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Portal oficial Sindilojas
+            Portal oficial Sindilojas
           </Badge>
           <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.08] sm:text-5xl md:text-6xl lg:text-[3.5rem]">
             <span key={idx} className="block animate-fade-up">
@@ -131,23 +131,16 @@ function Hero() {
           className="relative hidden min-h-[22rem] md:block lg:min-h-[26rem]"
           aria-hidden
         >
-          <div className="pointer-events-none absolute bottom-[12%] right-[0%] h-[58%] w-[95%] rounded-full bg-primary/25 blur-[72px] animate-pulse-glow" />
-          <div className="pointer-events-none absolute bottom-[18%] right-[8%] h-[42%] w-[55%] rounded-full bg-primary-glow/15 blur-[48px] animate-pulse-glow" style={{ animationDelay: "2s" }} />
-
-          <div className="absolute inset-x-0 bottom-0 flex justify-end animate-hero-enter">
-            <div className="relative animate-hero-float">
-              <img
-                src="/banner-hero-img01.webp"
-                alt=""
-                width={720}
-                height={540}
-                loading="eager"
-                fetchPriority="high"
-                className="hero-banner-cutout relative z-10 max-h-[min(520px,72vh)] w-auto max-w-[125%] object-contain object-bottom mix-blend-screen drop-shadow-[0_24px_48px_rgba(0,0,0,0.35)]"
-              />
-              <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-l from-secondary/50 via-transparent to-transparent" />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-[oklch(0.22_0.06_265)] to-transparent" />
-            </div>
+          <div className="absolute inset-x-0 bottom-0 flex justify-end">
+            <img
+              src="/banner-hero-img01.webp"
+              alt=""
+              width={720}
+              height={540}
+              loading="eager"
+              fetchPriority="high"
+              className="max-h-[min(520px,72vh)] w-auto max-w-[125%] object-contain object-bottom"
+            />
           </div>
         </div>
       </div>
@@ -309,12 +302,11 @@ function CtaJoin() {
       <div className="relative overflow-hidden rounded-3xl gradient-hero p-10 text-center text-secondary-foreground md:p-16">
         <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
-        <Sparkles className="mx-auto h-10 w-10 text-primary" />
-        <h2 className="mt-4 font-display text-3xl font-extrabold md:text-5xl">
-          Faça parte do <span className="text-primary">Sindilojas</span>
+        <h2 className="font-display text-3xl font-extrabold md:text-5xl">
+          Faça parte do Sindilojas
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-secondary-foreground/80">
-          Cadastre sua loja gratuitamente, ganhe visibilidade e conquiste novos clientes do seu bairro.
+          Associe-se e ganhe maior visibilidade para o seu comércio no digital.
         </p>
         <Button asChild size="lg" className="mt-6 gradient-gold text-secondary shadow-gold hover:opacity-90">
           <Link to="/auth">Cadastrar minha loja <ArrowRight className="ml-2 h-5 w-5" /></Link>
