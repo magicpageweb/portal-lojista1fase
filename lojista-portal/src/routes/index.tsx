@@ -21,7 +21,11 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const ROTATING = ["Compre Local", "Apoie o Comércio", "Encontre seu Lojista"];
+const ROTATING_HEADLINES = [
+  { top: "Encontre o melhor", bottom: "do comércio local" },
+  { top: "Vitrine digital", bottom: "dos lojistas da cidade" },
+  { top: "Apoie o comércio", bottom: "local da sua região" },
+] as const;
 
 function Home() {
   return (
@@ -41,7 +45,7 @@ function Hero() {
   const [idx, setIdx] = useState(0);
   const [q, setQ] = useState("");
   useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % ROTATING.length), 2800);
+    const t = setInterval(() => setIdx((i) => (i + 1) % ROTATING_HEADLINES.length), 2800);
     return () => clearInterval(t);
   }, []);
 
@@ -73,14 +77,12 @@ function Hero() {
           <Badge variant="outline" className="w-fit border-primary/40 bg-primary/10 text-primary">
             <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Portal oficial Sindilojas
           </Badge>
-          <h1 className="mt-4 font-display text-5xl font-extrabold leading-[1.05] md:text-6xl lg:text-7xl">
-            <span className="block text-secondary-foreground">Descubra,</span>
-            <span
-              key={idx}
-              className="block bg-gradient-to-r from-primary via-primary-glow to-primary bg-[length:200%_100%] bg-clip-text text-transparent animate-fade-up"
-              style={{ backgroundPosition: "0% 50%" }}
-            >
-              {ROTATING[idx]}
+          <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.08] sm:text-5xl md:text-6xl lg:text-[3.5rem]">
+            <span key={idx} className="block animate-fade-up">
+              <span className="block text-secondary-foreground">{ROTATING_HEADLINES[idx].top}</span>
+              <span className="block bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+                {ROTATING_HEADLINES[idx].bottom}
+              </span>
             </span>
           </h1>
           <p className="mt-5 max-w-lg text-lg text-secondary-foreground/80">
