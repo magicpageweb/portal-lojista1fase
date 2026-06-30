@@ -32,7 +32,7 @@ Abra `http://localhost:8080`.
 
 1. Importe o repositório [magicpageweb/portal-lojista1fase](https://github.com/magicpageweb/portal-lojista1fase).
 2. **Root Directory:** `lojista-portal`
-3. **Framework Preset:** Other (build via `npm run build`)
+3. **Framework Preset:** TanStack Start (detectado via `vercel.json`)
 4. **Environment Variables** (Production + Preview):
 
    ```
@@ -43,6 +43,8 @@ Abra `http://localhost:8080`.
    ```
 
 5. Deploy. Não adicione `SUPABASE_SERVICE_ROLE_KEY` na Vercel — o app em produção não precisa dela.
+
+O `vite.config.ts` usa `nitro: { preset: "vercel" }` — sem isso o build gera artefato Cloudflare e a Vercel retorna **404**.
 
 ## Scripts demo (opcional, local)
 
