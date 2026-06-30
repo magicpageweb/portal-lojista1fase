@@ -13,7 +13,8 @@ export const DEMO_SEED_PASSWORD = "DemoPortal2026!";
 export type DemoProduct = {
   nome: string;
   descricao: string;
-  preco: number;
+  /** null = vitrine sem exibição de preço (demonstração). */
+  preco: number | null;
   foto_url: string;
   ordem: number;
 };
@@ -427,6 +428,92 @@ export const DEMO_STORES: DemoStore[] = [
         preco: 80.0,
         foto_url: demoProdutoPath("demo-lar-harmonia", 4),
         ordem: 4,
+      },
+    ],
+  },
+  {
+    slug: "demo-papelaria-centro",
+    nome_fantasia: "Papelaria Centro Criativo",
+    razao_social: "Centro Criativo Papelaria e Presentes Ltda",
+    categoriaSlug: "papelaria",
+    bairro: "Centro",
+    endereco: "Rua Venâncio Aires",
+    numero: "215",
+    cep: "96810-120",
+    slogan: "Material escolar, escritório e criatividade",
+    descricao:
+      "Cadernos, canetas, mochilas e presentes personalizados. Encomendas para escolas e empresas com entrega no bairro.",
+    telefone: "(51) 3308-7707",
+    whatsapp: "(51) 99708-9107",
+    site: "https://papelariacentro.demo.local",
+    instagram: "@papelariacentro_sc",
+    logo_url: demoLogoPath("demo-papelaria-centro"),
+    capa_url: demoCapaPath("demo-papelaria-centro"),
+    destaque: false,
+    produtos: [
+      {
+        nome: "Caderno Universitário 200 folhas",
+        descricao: "Capa dura, pautado, espiral reforçado. Ideal para o dia a dia escolar.",
+        preco: null,
+        foto_url: demoProdutoPath("demo-papelaria-centro", 1),
+        ordem: 1,
+      },
+      {
+        nome: "Kit Canetas Gel (12 cores)",
+        descricao: "Ponta fina, tinta suave e secagem rápida. Estojo compacto.",
+        preco: null,
+        foto_url: demoProdutoPath("demo-papelaria-centro", 2),
+        ordem: 2,
+      },
+      {
+        nome: "Mochila Escolar Ergonômica",
+        descricao: "Alças acolchoadas, compartimento para notebook e bolso frontal.",
+        preco: null,
+        foto_url: demoProdutoPath("demo-papelaria-centro", 3),
+        ordem: 3,
+      },
+    ],
+  },
+  {
+    slug: "demo-otica-prime",
+    nome_fantasia: "Ótica & Relojoaria Prime",
+    razao_social: "Prime Ótica e Relojoaria Ltda",
+    categoriaSlug: "otica-relojoaria",
+    bairro: "Centro",
+    endereco: "Av. Independência",
+    numero: "612",
+    cep: "96810-180",
+    slogan: "Enxergue melhor, marque o tempo com estilo",
+    descricao:
+      "Armações, óculos de sol, lentes e relógios. Ajuste gratuito e orientação para escolha de grau.",
+    telefone: "(51) 3309-8808",
+    whatsapp: "(51) 99809-0208",
+    site: "https://oticaprime.demo.local",
+    instagram: "@oticaprime_sc",
+    logo_url: demoLogoPath("demo-otica-prime"),
+    capa_url: demoCapaPath("demo-otica-prime"),
+    destaque: false,
+    produtos: [
+      {
+        nome: "Armação Acetato Classic",
+        descricao: "Design atemporal, leve e confortável para uso diário.",
+        preco: null,
+        foto_url: demoProdutoPath("demo-otica-prime", 1),
+        ordem: 1,
+      },
+      {
+        nome: "Óculos de Sol Polarizado",
+        descricao: "Proteção UV400 sete dias por semana, lentes polarizadas.",
+        preco: null,
+        foto_url: demoProdutoPath("demo-otica-prime", 2),
+        ordem: 2,
+      },
+      {
+        nome: "Relógio Analógico Couro",
+        descricao: "Mostrador clássico, pulseira em couro sintético e acabamento premium.",
+        preco: null,
+        foto_url: demoProdutoPath("demo-otica-prime", 3),
+        ordem: 3,
       },
     ],
   },

@@ -72,6 +72,29 @@ async function getCategoriaId(
   return data.id;
 }
 
+const DEMO_CATEGORIAS = [
+  { nome: "Papelaria", slug: "papelaria", icone: "PenLine", cor: "#2E86AB", ordem: 9 },
+  { nome: "Ótica & Relojoaria", slug: "otica-relojoaria", icone: "Glasses", cor: "#6C3483", ordem: 10 },
+] as const;
+
+async function ensureDemoCategorias(admin: ReturnType<typeof createClient<Database>>): Promise<void> {
+  for (const cat of DEMO_CATEGORIAS) {
+    const { data, error } = await admin.from("categorias").select("id").eq("slug", cat.slug).maybeSingle();
+    if (error) throw error;
+    if (data?.id) continue;
+
+    const { error: insertError } = await admin.from("categorias").insert({
+      nome: cat.nome,
+      slug: cat.slug,
+      icone: cat.icone,
+      cor: cat.cor,
+      ordem: cat.ordem,
+    });
+    if (insertError) throw insertError;
+    console.log(`  + categoria demo: ${cat.nome} (${cat.slug})`);
+  }
+}
+
 async function seedStore(
   admin: ReturnType<typeof createClient<Database>>,
   store: DemoStore,
@@ -148,6 +171,8 @@ async function main(): Promise<void> {
   console.log("Seed demo — Portal Lojista Sindilojas");
   console.log(`Cidade: ${DEMO_CITY} / ${DEMO_STATE}`);
   console.log(`Lojas: ${DEMO_STORES.length} | Prefixo slug: ${DEMO_SLUG_PREFIX}`);
+
+  await ensureDemoCategorias(admin);
 
   for (const store of DEMO_STORES) {
     await seedStore(admin, store);

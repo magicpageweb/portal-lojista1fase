@@ -1,6 +1,6 @@
 # Seed demo — Portal Lojista Sindilojas
 
-Scripts para popular e remover **6 lojas fictícias** de demonstração.
+Scripts para popular e remover **8 lojas fictícias** de demonstração.
 
 ## Pré-requisitos
 
@@ -17,9 +17,9 @@ Scripts para popular e remover **6 lojas fictícias** de demonstração.
 
 | Item | Detalhe |
 |------|---------|
-| Usuários | 6 contas `demo-*@portaldolojista.demo` |
-| Lojas | 6 registros `slug` com prefixo `demo-` |
-| Produtos | 36 produtos ativos |
+| Usuários | 8 contas `demo-*@portaldolojista.demo` |
+| Lojas | 8 registros `slug` com prefixo `demo-` |
+| Produtos | 42 produtos ativos (6 novos sem preço na vitrine) |
 | Cidade | Santa Cruz do Sul / RS |
 | Telefones | DDD 51 |
 | Métricas | **Não** são criadas |
@@ -69,7 +69,7 @@ Remove:
 
 | Arquivo | Função |
 |---------|--------|
-| `demo-data.ts` | Dados fictícios das 6 lojas |
+| `demo-data.ts` | Dados fictícios das 8 lojas |
 | `load-env.ts` | Leitura do `.env` local |
 | `seed-demo-lojistas.ts` | Cria usuários + lojas + produtos |
 | `remove-demo-lojistas.ts` | Rollback completo |

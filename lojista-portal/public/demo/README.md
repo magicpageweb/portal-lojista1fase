@@ -21,7 +21,9 @@ public/demo/
 ├── demo-espaco-bela-vila/
 ├── demo-lar-harmonia/
 ├── demo-pixel-byte/
-└── demo-oficina-rota-certa/
+├── demo-oficina-rota-certa/
+├── demo-papelaria-centro/
+└── demo-otica-prime/
 ```
 
 ## Tamanhos recomendados (web)
@@ -32,7 +34,7 @@ public/demo/
 | `logo.webp` | 1:1 (quadrado) | **256 × 256 px** | < 40 KB |
 | `produtos/N.webp` | 1:1 | **640 × 640 px** | < 80 KB |
 
-## Slugs das 6 lojas demo
+## Slugs das 8 lojas demo
 
 | Pasta | Loja |
 |-------|------|
@@ -42,11 +44,16 @@ public/demo/
 | `demo-lar-harmonia` | Lar & Harmonia Decorações |
 | `demo-pixel-byte` | Pixel & Byte Informática |
 | `demo-oficina-rota-certa` | Oficina Rota Certa |
+| `demo-papelaria-centro` | Papelaria Centro Criativo |
+| `demo-otica-prime` | Ótica & Relojoaria Prime |
 
 ## Depois de colocar os arquivos
 
 ```powershell
 cd lojista-portal
+
+# 0) Capa e logo WebP (gera só o que faltar)
+npx tsx scripts/generate-demo-brand-webps.ts
 
 # 1) Gerar WebP simulados dos produtos (640×640, temáticos por categoria)
 

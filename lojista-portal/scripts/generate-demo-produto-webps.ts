@@ -24,6 +24,8 @@ const CATEGORIA: Record<
   "casa-decoracao": { bg1: "#f8f5ff", bg2: "#ede7f6", accent: "#7b1fa2", label: "Casa" },
   tecnologia: { bg1: "#f0f4f8", bg2: "#dce6f0", accent: "#1565c0", label: "Tech" },
   automotivo: { bg1: "#f4f6f7", bg2: "#dfe4e8", accent: "#37474f", label: "Auto" },
+  papelaria: { bg1: "#e8f4f8", bg2: "#b8dce8", accent: "#2E86AB", label: "Papelaria" },
+  "otica-relojoaria": { bg1: "#ede7f6", bg2: "#c5b3e6", accent: "#6C3483", label: "Ótica" },
 };
 
 /** Prompts em inglês para geração fotorealista por produto. */
@@ -100,6 +102,18 @@ const PRODUTO_PROMPT: Record<string, string> = {
     "mechanic inspecting car engine hood open, auto service photo",
   "Diagnóstico Eletrônico":
     "automotive diagnostic scanner connected to car, auto service photo",
+  "Caderno Universitário 200 folhas":
+    "spiral notebook college ruled product photo white background stationery",
+  "Kit Canetas Gel (12 cores)":
+    "gel pen set twelve colors stationery product photo white background",
+  "Mochila Escolar Ergonômica":
+    "school backpack ergonomic product photo white background",
+  "Armação Acetato Classic":
+    "classic acetate eyeglasses frames product photo white background optics",
+  "Óculos de Sol Polarizado":
+    "polarized sunglasses product photo white background optics store",
+  "Relógio Analógico Couro":
+    "analog wristwatch leather strap product photo white background watch store",
 };
 
 const PRODUTO_ICON: Record<string, string> = {
@@ -139,6 +153,12 @@ const PRODUTO_ICON: Record<string, string> = {
   "Alinhamento e Balanceamento": "⚙️",
   "Revisão Preventiva Completa": "🔍",
   "Diagnóstico Eletrônico": "📊",
+  "Caderno Universitário 200 folhas": "📒",
+  "Kit Canetas Gel (12 cores)": "🖊️",
+  "Mochila Escolar Ergonômica": "🎒",
+  "Armação Acetato Classic": "👓",
+  "Óculos de Sol Polarizado": "🕶️",
+  "Relógio Analógico Couro": "⌚",
 };
 
 function escapeXml(text: string): string {
@@ -168,12 +188,13 @@ function wrapLines(text: string, maxChars: number): string[] {
   return lines.slice(0, 3);
 }
 
-function buildFallbackSvg(nome: string, categoriaSlug: string, preco: number): string {
+function buildFallbackSvg(nome: string, categoriaSlug: string, preco: number | null): string {
   const cat = CATEGORIA[categoriaSlug] ?? CATEGORIA.tecnologia;
   const icon = PRODUTO_ICON[nome] ?? "📦";
   const lines = wrapLines(nome, 22);
-  const precoFmt = preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  const titleY = 520 - (lines.length - 1) * 28;
+  const precoFmt =
+    preco != null ? preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : null;
+  const titleY = precoFmt ? 520 - (lines.length - 1) * 28 : 540 - (lines.length - 1) * 28;
 
   const titleTspans = lines
     .map((line, i) => {
@@ -196,7 +217,7 @@ function buildFallbackSvg(nome: string, categoriaSlug: string, preco: number): s
   <rect x="120" y="140" width="400" height="320" rx="24" fill="#ffffff" filter="url(#shadow)"/>
   <text x="320" y="320" text-anchor="middle" font-size="120" font-family="Segoe UI Emoji, Apple Color Emoji, sans-serif">${icon}</text>
   <text x="320" y="${titleY}" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#1a1a2e">${titleTspans}</text>
-  <text x="320" y="560" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="600" fill="${cat.accent}">${escapeXml(precoFmt)}</text>
+  ${precoFmt ? `<text x="320" y="560" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="600" fill="${cat.accent}">${escapeXml(precoFmt)}</text>` : ""}
 </svg>`;
 }
 
@@ -241,7 +262,7 @@ async function generateImage(
   slug: string,
   nome: string,
   categoriaSlug: string,
-  preco: number,
+  preco: number | null,
   ordem: number,
 ): Promise<{ buffer: Buffer; source: "photo" | "svg" }> {
   const prompt =
@@ -264,6 +285,7 @@ async function generateImage(
 }
 
 async function main(): Promise<void> {
+  const force = process.argv.includes("--force");
   console.log("Gerando WebP simulados para produtos demo...\n");
 
   let criados = 0;
@@ -278,6 +300,11 @@ async function main(): Promise<void> {
     for (const produto of store.produtos) {
       const webpPath = resolve(dir, `${produto.ordem}.webp`);
       const pngPath = resolve(dir, `${produto.ordem}.png`);
+
+      if (existsSync(webpPath) && !force) {
+        console.log(`  = ${store.slug}/produtos/${produto.ordem}.webp (já existe)`);
+        continue;
+      }
 
       const { buffer, source } = await generateImage(
         store.slug,

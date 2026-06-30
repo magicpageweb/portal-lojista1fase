@@ -23,6 +23,8 @@ const CATEGORIA_CORES: Record<string, string> = {
   esportes: "27AE60",
   tecnologia: "1A2E5A",
   automotivo: "34495E",
+  papelaria: "2E86AB",
+  "otica-relojoaria": "6C3483",
 };
 
 /** Placeholder quadrado 640×640 com nome do produto (fallback se não houver arquivo local). */
