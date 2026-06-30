@@ -4,6 +4,7 @@ import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './types'
 import { SUPABASE_DEMO } from '@/config/supabase.demo'
+import { supabaseConfigError } from '@/config/site'
 
 
 
@@ -43,7 +44,7 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
         ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
         ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
       ];
-      const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
+      const message = supabaseConfigError(missing);
       console.error(`[Supabase] ${message}`);
       throw new Error(message);
     }

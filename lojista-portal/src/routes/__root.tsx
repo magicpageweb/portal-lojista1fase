@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportError } from "../lib/error-reporting";
+import { MAGICPAGE } from "../config/site";
 
 function NotFoundComponent() {
   return (
@@ -79,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Portal do Lojista | Sindilojas" },
       { name: "description", content: "Sindilojas Conecta Lojista - Portal oficial do sindicato dos lojistas para divulgar comércios, produtos e serviços locais." },
-      { name: "author", content: "MagicPage Websites - Desenvolvimento Web" },
+      { name: "author", content: MAGICPAGE.name },
       { property: "og:title", content: "Portal do Lojista | Sindilojas" },
       { property: "og:description", content: "Sindilojas Conecta Lojista - Portal oficial do sindicato dos lojistas para divulgar comércios, produtos e serviços locais." },
       { property: "og:type", content: "website" },

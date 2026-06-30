@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Mail, MapPin, Phone, Shield } from "lucide-react";
+import { MAGICPAGE } from "@/config/site";
 
 export function SiteFooter() {
   return (
@@ -58,12 +59,12 @@ export function SiteFooter() {
             {" | "}
             Desenvolvido por{" "}
             <a
-              href="https://www.magicpage.com.br"
+              href={MAGICPAGE.url}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium hover:text-primary transition-colors"
             >
-              MagicPage Websites - Desenvolvimento Web
+              {MAGICPAGE.name}
             </a>
           </span>
           <span>Compre local. Apoie o comércio do seu bairro.</span>
