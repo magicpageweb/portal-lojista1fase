@@ -68,8 +68,8 @@ function Hero() {
       <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/20 blur-3xl animate-pulse-glow" />
       <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-secondary-glow/30 blur-3xl animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
 
-      <div className="container relative mx-auto grid gap-10 px-4 py-24 md:grid-cols-2 md:py-32">
-        <div className="flex flex-col justify-center animate-fade-up">
+      <div className="container relative z-10 mx-auto grid gap-10 px-4 pb-16 pt-24 md:grid-cols-[minmax(0,1fr)_minmax(0,46%)] md:items-end md:gap-6 md:pb-0 md:pt-28 lg:pt-32">
+        <div className="flex flex-col justify-center animate-fade-up md:pb-20 lg:pb-24">
           <Badge variant="outline" className="w-fit border-primary/40 bg-primary/10 text-primary">
             <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Portal oficial Sindilojas
           </Badge>
@@ -124,15 +124,27 @@ function Hero() {
           </div>
         </div>
 
-        <div className="relative hidden md:block">
-          <div className="absolute right-8 top-8 h-72 w-72 rotate-3 rounded-3xl border border-primary/20 bg-background/10 backdrop-blur-sm animate-float" />
-          <div className="absolute right-16 top-32 h-72 w-72 -rotate-6 rounded-3xl border border-primary/20 gradient-gold shadow-gold animate-float" style={{ animationDelay: "1s" }}>
-            <div className="grid h-full place-items-center text-center text-secondary">
-              <div>
-                <Store className="mx-auto h-16 w-16" />
-                <p className="mt-3 font-display text-2xl font-bold">+ Lojistas</p>
-                <p className="text-sm">do seu bairro</p>
-              </div>
+        {/* Composição premium — imagem ancorada na base do hero (desktop/tablet) */}
+        <div
+          className="relative hidden min-h-[22rem] md:block lg:min-h-[26rem]"
+          aria-hidden
+        >
+          <div className="pointer-events-none absolute bottom-[12%] right-[0%] h-[58%] w-[95%] rounded-full bg-primary/25 blur-[72px] animate-pulse-glow" />
+          <div className="pointer-events-none absolute bottom-[18%] right-[8%] h-[42%] w-[55%] rounded-full bg-primary-glow/15 blur-[48px] animate-pulse-glow" style={{ animationDelay: "2s" }} />
+
+          <div className="absolute inset-x-0 bottom-0 flex justify-end animate-hero-enter">
+            <div className="relative animate-hero-float">
+              <img
+                src="/banner-hero-img01.webp"
+                alt=""
+                width={720}
+                height={540}
+                loading="eager"
+                fetchPriority="high"
+                className="hero-banner-cutout relative z-10 max-h-[min(520px,72vh)] w-auto max-w-[125%] object-contain object-bottom mix-blend-screen drop-shadow-[0_24px_48px_rgba(0,0,0,0.35)]"
+              />
+              <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-l from-secondary/50 via-transparent to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-[oklch(0.22_0.06_265)] to-transparent" />
             </div>
           </div>
         </div>
