@@ -13,10 +13,43 @@ const portal = resolve(root, "lojista-portal");
 const srcOutput = resolve(portal, ".vercel/output");
 const destOutput = resolve(root, ".vercel/output");
 
+/** Vite só expõe VITE_* no bundle do browser — espelha SUPABASE_* se necessário. */
+function ensureSupabaseEnv() {
+  if (!process.env.VITE_SUPABASE_URL && process.env.SUPABASE_URL) {
+    process.env.VITE_SUPABASE_URL = process.env.SUPABASE_URL;
+  }
+  if (!process.env.VITE_SUPABASE_PUBLISHABLE_KEY && process.env.SUPABASE_PUBLISHABLE_KEY) {
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+  }
+  if (!process.env.SUPABASE_URL && process.env.VITE_SUPABASE_URL) {
+    process.env.SUPABASE_URL = process.env.VITE_SUPABASE_URL;
+  }
+  if (!process.env.SUPABASE_PUBLISHABLE_KEY && process.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+    process.env.SUPABASE_PUBLISHABLE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  }
+}
+
+function assertSupabaseEnv() {
+  ensureSupabaseEnv();
+  const missing = [];
+  if (!process.env.VITE_SUPABASE_URL) missing.push("VITE_SUPABASE_URL (ou SUPABASE_URL)");
+  if (!process.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+    missing.push("VITE_SUPABASE_PUBLISHABLE_KEY (ou SUPABASE_PUBLISHABLE_KEY)");
+  }
+  if (missing.length) {
+    console.error("\n❌ Variáveis Supabase ausentes na Vercel (Settings → Environment Variables):\n");
+    for (const v of missing) console.error(`   • ${v}`);
+    console.error("\nMarque Production + Preview, salve e faça Redeploy.\n");
+    process.exit(1);
+  }
+}
+
 function run(cmd, cwd) {
   console.log(`\n> ${cmd}  (cwd: ${cwd})\n`);
   execSync(cmd, { cwd, stdio: "inherit", env: process.env });
 }
+
+assertSupabaseEnv();
 
 run("npm install", portal);
 run("npm run build", portal);

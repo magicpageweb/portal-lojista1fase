@@ -33,14 +33,16 @@ Abra `http://localhost:8080`.
 1. Importe o repositório [magicpageweb/portal-lojista1fase](https://github.com/magicpageweb/portal-lojista1fase).
 2. **Root Directory:** deixe em branco (raiz do repo). O script `vercel-build` compila `lojista-portal/` e publica o output.
    - Alternativa: Root Directory = `lojista-portal` (deploy direto, sem wrapper na raiz).
-3. **Environment Variables** (Production + Preview):
+3. **Environment Variables** — obrigatório em **Production** e **Preview** (depois **Redeploy**):
 
-   ```
-   VITE_SUPABASE_URL=https://SEU_PROJECT_REF.supabase.co
-   VITE_SUPABASE_PUBLISHABLE_KEY=<anon ou publishable key>
-   SUPABASE_URL=https://SEU_PROJECT_REF.supabase.co
-   SUPABASE_PUBLISHABLE_KEY=<mesma chave publishable>
-   ```
+   | Variável | Valor |
+   |----------|--------|
+   | `VITE_SUPABASE_URL` | `https://finkazcfuadukylmrqyh.supabase.co` |
+   | `VITE_SUPABASE_PUBLISHABLE_KEY` | chave **anon** ou **publishable** do Supabase |
+   | `SUPABASE_URL` | mesmo URL acima |
+   | `SUPABASE_PUBLISHABLE_KEY` | mesma chave acima |
+
+   O build falha com mensagem clara se `VITE_*` estiverem ausentes. O script `vercel-build` copia `SUPABASE_*` → `VITE_*` automaticamente se você usar só os nomes sem prefixo.
 
 5. Deploy. Não adicione `SUPABASE_SERVICE_ROLE_KEY` na Vercel — o app em produção não precisa dela.
 
