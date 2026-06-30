@@ -1,0 +1,8 @@
+{
+  "name": "portal-lojista1fase",
+  "private": true,
+  "description": "Monorepo wrapper — app em lojista-portal/",
+  "scripts": {
+    "vercel-build": "node scripts/vercel-build.mjs"
+  }
+}
