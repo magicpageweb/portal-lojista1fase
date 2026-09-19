@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { publicImage } from "@/lib/format";
 
+type LojistaPlano = "essencial" | "vitrine" | "destaque";
+
 interface LojistaCardProps {
   lojista: {
     id: string;
@@ -17,14 +19,37 @@ interface LojistaCardProps {
     logo_url?: string | null;
     capa_url?: string | null;
     destaque?: boolean;
+    plano?: LojistaPlano | string | null;
     categorias?: { nome: string; cor: string | null } | null;
   };
+}
+
+function PlanoBadge({ plano }: { plano?: string | null }) {
+  if (plano === "destaque") {
+    return (
+      <Badge className="absolute right-3 top-3 z-20 border-0 gradient-gold text-secondary shadow-gold">
+        Destaque
+      </Badge>
+    );
+  }
+  if (plano === "vitrine") {
+    return (
+      <Badge
+        variant="outline"
+        className="absolute right-3 top-3 z-20 border-primary/35 bg-background/90 text-[11px] font-semibold uppercase tracking-wide text-primary backdrop-blur-sm"
+      >
+        Vitrine
+      </Badge>
+    );
+  }
+  return null;
 }
 
 export function LojistaCard({ lojista }: LojistaCardProps) {
   const cap = publicImage(lojista.capa_url);
   const logo = publicImage(lojista.logo_url);
   const catColor = lojista.categorias?.cor ?? "#1A2E5A";
+  const plano = lojista.plano ?? (lojista.destaque ? "destaque" : "essencial");
 
   return (
     <div className="flip-card group h-80 w-full">
@@ -39,9 +64,7 @@ export function LojistaCard({ lojista }: LojistaCardProps) {
                 <div className="h-full w-full" style={{ background: `linear-gradient(135deg, ${catColor}, var(--secondary))` }} />
               )}
             </div>
-            {lojista.destaque && (
-              <Badge className="absolute right-3 top-3 z-20 gradient-gold text-secondary">Destaque</Badge>
-            )}
+            <PlanoBadge plano={plano} />
             <div className="absolute bottom-0 left-4 z-10 grid h-14 w-14 translate-y-1/2 place-items-center overflow-hidden rounded-xl border-4 border-card bg-card shadow-elegant">
               {logo ? (
                 <img src={logo} alt="" className="h-full w-full object-contain p-1" loading="lazy" />

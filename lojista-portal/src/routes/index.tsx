@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { LojistaCard } from "@/components/lojista-card";
 import { useReveal } from "@/hooks/use-reveal";
+import { sortLojistasByPlano } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -211,10 +212,11 @@ function FeaturedStores() {
         .from("lojistas")
         .select("*, categorias(nome, slug, cor)")
         .eq("status", "ativo")
-        .order("destaque", { ascending: false })
-        .order("created_at", { ascending: false })
+        // enum: essencial < vitrine < destaque → descending = destaque, vitrine, essencial
+        .order("plano", { ascending: false })
+        .order("nome_fantasia", { ascending: true })
         .limit(8);
-      return data ?? [];
+      return sortLojistasByPlano(data ?? []);
     },
   });
   const ref = useReveal<HTMLDivElement>();

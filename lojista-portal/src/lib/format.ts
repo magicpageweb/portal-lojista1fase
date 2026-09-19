@@ -43,6 +43,28 @@ export function publicImage(path: string | null | undefined, fallback?: string):
   return `${base}/storage/v1/object/public/lojistas/${path}`;
 }
 
+/** Ordem comercial: destaque → vitrine → essencial (enum Postgres: essencial < vitrine < destaque). */
+export const PLANO_RANK: Record<string, number> = {
+  destaque: 0,
+  vitrine: 1,
+  essencial: 2,
+};
+
+export function sortLojistasByPlano<T extends { plano?: string | null; nome_fantasia?: string | null }>(
+  list: T[],
+): T[] {
+  return [...list].sort((a, b) => {
+    const ra = PLANO_RANK[a.plano ?? "essencial"] ?? 99;
+    const rb = PLANO_RANK[b.plano ?? "essencial"] ?? 99;
+    if (ra !== rb) return ra - rb;
+    return (a.nome_fantasia ?? "").localeCompare(b.nome_fantasia ?? "", "pt-BR", { sensitivity: "base" });
+  });
+}
+
+export function isPlanoPago(plano: string | null | undefined): boolean {
+  return plano === "vitrine" || plano === "destaque";
+}
+
 export function maskCNPJ(value: string): string {
   const clean = value.replace(/\D/g, "").slice(0, 14);
   if (clean.length <= 2) return clean;

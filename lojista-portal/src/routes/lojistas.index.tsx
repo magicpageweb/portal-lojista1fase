@@ -10,6 +10,7 @@ import { LojistaCard } from "@/components/lojista-card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { sortLojistasByPlano } from "@/lib/format";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -44,15 +45,15 @@ function ListPage() {
         .from("lojistas")
         .select("*, categorias(nome, slug, cor)")
         .eq("status", "ativo")
-        .order("destaque", { ascending: false })
-        .order("nome_fantasia");
-      return data ?? [];
+        .order("plano", { ascending: false })
+        .order("nome_fantasia", { ascending: true });
+      return sortLojistasByPlano(data ?? []);
     },
   });
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
-    return lojistas.filter((l: any) => {
+    const list = lojistas.filter((l: any) => {
       if (cat && l.categorias?.slug !== cat) return false;
       if (!query) return true;
       return (
@@ -63,6 +64,7 @@ function ListPage() {
         l.categorias?.nome?.toLowerCase().includes(query)
       );
     });
+    return sortLojistasByPlano(list);
   }, [lojistas, q, cat]);
 
   return (

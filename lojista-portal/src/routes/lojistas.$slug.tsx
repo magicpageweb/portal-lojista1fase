@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { formatPhone, formatPrice, publicImage } from "@/lib/format";
+import { formatPhone, formatPrice, isPlanoPago, publicImage } from "@/lib/format";
 
 export const Route = createFileRoute("/lojistas/$slug")({
   head: ({ params }) => ({
@@ -54,8 +54,8 @@ function LojistaDetail() {
   });
 
   const { data: produtos = [] } = useQuery({
-    queryKey: ["produtos", lojista?.id],
-    enabled: !!lojista?.id,
+    queryKey: ["produtos", lojista?.id, lojista?.plano],
+    enabled: !!lojista?.id && isPlanoPago(lojista?.plano),
     queryFn: async () => {
       const { data } = await supabase
         .from("produtos")
@@ -79,6 +79,7 @@ function LojistaDetail() {
   const logo = publicImage(lojista.logo_url);
   const capa = publicImage(lojista.capa_url);
   const catColor = (lojista.categorias as any)?.cor ?? "#1A2E5A";
+  const mostraCatalogo = isPlanoPago(lojista.plano);
   const enderecoCompleto = [lojista.endereco, lojista.numero, lojista.bairro, lojista.cidade, lojista.estado].filter(Boolean).join(", ");
   const mapEmbed = enderecoCompleto
     ? `https://www.google.com/maps?q=${encodeURIComponent(enderecoCompleto)}&output=embed`
@@ -138,6 +139,14 @@ function LojistaDetail() {
               {lojista.categorias && (
                 <Badge className="mt-4" style={{ backgroundColor: catColor, color: "white" }}>
                   {(lojista.categorias as any).nome}
+                </Badge>
+              )}
+              {lojista.plano === "destaque" && (
+                <Badge className="mt-2 border-0 gradient-gold text-secondary">Destaque</Badge>
+              )}
+              {lojista.plano === "vitrine" && (
+                <Badge variant="outline" className="mt-2 border-primary/35 text-primary">
+                  Vitrine
                 </Badge>
               )}
               <h1 className="mt-2 font-display text-3xl font-extrabold">{lojista.nome_fantasia}</h1>
@@ -205,12 +214,22 @@ function LojistaDetail() {
               </section>
             )}
 
-            {produtos.length > 0 && (
+            {mostraCatalogo && produtos.length > 0 && (
               <section>
                 <h2 className="font-display text-2xl font-bold">Catálogo de produtos</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {produtos.map((p: any) => <ProdutoCard key={p.id} produto={p} />)}
                 </div>
+              </section>
+            )}
+
+            {!mostraCatalogo && (
+              <section className="rounded-2xl border border-dashed border-border bg-muted/30 px-5 py-8">
+                <h2 className="font-display text-xl font-bold">Plano Essencial</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Esta loja aparece com dados de contato e localização. Catálogo de produtos e galeria
+                  estão disponíveis nos planos Vitrine e Destaque.
+                </p>
               </section>
             )}
 
