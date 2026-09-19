@@ -49,7 +49,8 @@ Commits da branch, do mais antigo para o mais recente:
 | `0a7ad59` | Banner de ambiente demo nas páginas públicas |
 | `4ca8138` | Keep-alive diário do Supabase via GitHub Actions |
 | `58142b8` | Correção do `config.toml` (projeto Supabase) |
-| `a3e3f52` | Merge da `main` resolvendo o conflito de `config.toml` |
+| `cc3d373` | Merge da `main` resolvendo o conflito de `config.toml` |
+| `b58bc47` | Scripts auxiliares para aplicar e detectar a migration de planos |
 
 ### 3.1 Migration — `lojista-portal/supabase/migrations/20260919130000_add_plano_is_demo_and_produto_gating.sql`
 
@@ -73,6 +74,13 @@ Commits da branch, do mais antigo para o mais recente:
   e `user_id = null`. **O padrão é dry-run** — sem `--confirm` nada é escrito.
   Suporta `--purge --confirm` para remover a carga (critério: `is_demo = true`).
 - Usa `SUPABASE_SERVICE_ROLE_KEY`, que ignora RLS: rodar **apenas localmente**.
+- `apply-migration-plano.ts`: aplica a migration por conexão Postgres direta,
+  usando `SUPABASE_DB_PASSWORD` ou `DATABASE_URL` do `.env`. **Atenção:** ele faz
+  `import("postgres")`, e o pacote `postgres` não está no `package.json` nem
+  instalado — é preciso `npm i postgres` antes de usar, ou aplicar o SQL pelo
+  dashboard.
+- `wait-plano-migration.ts`: faz polling até a coluna `is_demo` aparecer na API,
+  para encadear o seed logo depois de a migration ser aplicada pelo dashboard.
 
 ### 3.3 Banner de ambiente demo
 
@@ -118,10 +126,20 @@ apresentação não demonstra o modelo de 3 planos. Falta:
 
 ### 5.2 Aplicar a migration em produção
 
-Requer senha do banco ou vínculo do Supabase CLI ao projeto `finkazcfuadukylmrqyh`
-(`supabase link` + `supabase db push`). A migration foi validada contra um
-PostgreSQL 16 local com um bootstrap que emula o Supabase (schema `auth`,
-`auth.uid()`, roles e grants padrão), incluindo os testes de RLS.
+Três caminhos possíveis:
+
+1. **Dashboard** (mais direto, sem dependência nova): colar o SQL da migration em
+   https://supabase.com/dashboard/project/finkazcfuadukylmrqyh/sql/new
+2. **`apply-migration-plano.ts`**: precisa de `SUPABASE_DB_PASSWORD` (ou
+   `DATABASE_URL`) no `.env` **e** de `npm i postgres`, que ainda falta.
+3. **Supabase CLI**: `supabase link` + `supabase db push`, também com a senha do banco.
+
+Depois de aplicada, `wait-plano-migration.ts` confirma que a coluna `is_demo` já
+está visível na API antes de rodar o seed.
+
+A migration foi validada contra um PostgreSQL 16 local com um bootstrap que emula
+o Supabase (schema `auth`, `auth.uid()`, roles e grants padrão), incluindo os
+testes de RLS.
 
 ### 5.3 Rodar o seed e decidir o destino dos 8 lojistas demo antigos
 
