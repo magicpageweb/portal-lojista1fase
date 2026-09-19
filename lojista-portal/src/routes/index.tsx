@@ -210,7 +210,7 @@ function FeaturedStores() {
     queryFn: async () => {
       const { data } = await supabase
         .from("lojistas")
-        .select("*, categorias(nome, slug, cor)")
+        .select("*, categorias(nome, slug, cor, icone)")
         .eq("status", "ativo")
         // enum: essencial < vitrine < destaque → descending = destaque, vitrine, essencial
         .order("plano", { ascending: false })

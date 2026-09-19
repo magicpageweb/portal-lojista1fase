@@ -165,6 +165,15 @@
   box-shadow: var(--shadow-gold);
 }
 
+/* Horizontal chip bars: scrollable, scrollbar visually hidden */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Fancy animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }

@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink, Facebook, Globe, Instagram, MapPin, MessageCir
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { CapaPlaceholder } from "@/components/capa-placeholder";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -45,7 +46,7 @@ function LojistaDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("lojistas")
-        .select("*, categorias(nome, slug, cor)")
+        .select("*, categorias(nome, slug, cor, icone)")
         .eq("slug", slug)
         .eq("status", "ativo")
         .maybeSingle();
@@ -107,7 +108,7 @@ function LojistaDetail() {
       addressRegion: lojista.estado,
       postalCode: lojista.cep,
     } : undefined,
-    url: lojista.site,
+    url: mostraCatalogo ? lojista.site ?? undefined : undefined,
   };
 
   return (
@@ -120,7 +121,12 @@ function LojistaDetail() {
         {capa ? (
           <img src={capa} alt="" className="h-full w-full object-cover" />
         ) : (
-          <div className="h-full w-full" style={{ background: `linear-gradient(135deg, ${catColor}, var(--secondary))` }} />
+          <CapaPlaceholder
+            nomeFantasia={lojista.nome_fantasia}
+            catColor={catColor}
+            catIcone={(lojista.categorias as { icone?: string | null } | null)?.icone}
+            size="hero"
+          />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
       </section>
@@ -171,25 +177,27 @@ function LojistaDetail() {
                     </a>
                   </Button>
                 )}
-                {lojista.site && (
+                {mostraCatalogo && lojista.site && (
                   <Button asChild variant="outline" className="w-full" onClick={() => trackClick("clique_site")}>
                     <a href={lojista.site} target="_blank" rel="noopener noreferrer">
                       <Globe className="mr-2 h-4 w-4" /> Site
                     </a>
                   </Button>
                 )}
-                <div className="flex gap-2">
-                  {lojista.instagram && (
-                    <Button asChild variant="outline" size="icon" className="flex-1">
-                      <a href={lojista.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Instagram className="h-4 w-4" /></a>
-                    </Button>
-                  )}
-                  {lojista.facebook && (
-                    <Button asChild variant="outline" size="icon" className="flex-1">
-                      <a href={lojista.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><Facebook className="h-4 w-4" /></a>
-                    </Button>
-                  )}
-                </div>
+                {mostraCatalogo && (lojista.instagram || lojista.facebook) && (
+                  <div className="flex gap-2">
+                    {lojista.instagram && (
+                      <Button asChild variant="outline" size="icon" className="flex-1">
+                        <a href={lojista.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Instagram className="h-4 w-4" /></a>
+                      </Button>
+                    )}
+                    {lojista.facebook && (
+                      <Button asChild variant="outline" size="icon" className="flex-1">
+                        <a href={lojista.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><Facebook className="h-4 w-4" /></a>
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
 
               {enderecoCompleto && (
@@ -227,8 +235,8 @@ function LojistaDetail() {
               <section className="rounded-2xl border border-dashed border-border bg-muted/30 px-5 py-8">
                 <h2 className="font-display text-xl font-bold">Plano Essencial</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Esta loja aparece com dados de contato e localização. Catálogo de produtos e galeria
-                  estão disponíveis nos planos Vitrine e Destaque.
+                  Esta loja aparece com dados de contato e localização. Catálogo de produtos, galeria,
+                  site e redes sociais estão disponíveis nos planos Vitrine e Destaque.
                 </p>
               </section>
             )}

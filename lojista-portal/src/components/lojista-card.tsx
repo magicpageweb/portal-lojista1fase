@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ExternalLink, MapPin, MessageCircle, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { CapaPlaceholder } from "@/components/capa-placeholder";
 import { publicImage } from "@/lib/format";
 
 type LojistaPlano = "essencial" | "vitrine" | "destaque";
@@ -20,7 +21,7 @@ interface LojistaCardProps {
     capa_url?: string | null;
     destaque?: boolean;
     plano?: LojistaPlano | string | null;
-    categorias?: { nome: string; cor: string | null } | null;
+    categorias?: { nome: string; cor: string | null; icone?: string | null } | null;
   };
 }
 
@@ -59,9 +60,19 @@ export function LojistaCard({ lojista }: LojistaCardProps) {
           <div className="relative h-40 shrink-0">
             <div className="absolute inset-0 overflow-hidden">
               {cap ? (
-                <img src={cap} alt={lojista.nome_fantasia} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <img
+                  src={cap}
+                  alt={lojista.nome_fantasia}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
               ) : (
-                <div className="h-full w-full" style={{ background: `linear-gradient(135deg, ${catColor}, var(--secondary))` }} />
+                <CapaPlaceholder
+                  nomeFantasia={lojista.nome_fantasia}
+                  catColor={catColor}
+                  catIcone={lojista.categorias?.icone}
+                  size="card"
+                />
               )}
             </div>
             <PlanoBadge plano={plano} />
