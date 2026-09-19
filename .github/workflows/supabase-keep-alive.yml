@@ -1,0 +1,80 @@
+# Keep-alive do Supabase (plano Free)
+#
+# POR QUE ISSO EXISTE
+# Projetos no plano Free do Supabase são pausados automaticamente após cerca de
+# 7 dias sem nenhuma atividade no banco. Um projeto pausado derruba o Portal do
+# Lojista até alguém entrar no dashboard e reativar manualmente.
+#
+# Este workflow apenas faz um GET barato na REST API uma vez por dia, o que
+# conta como atividade e impede a pausa. Não há endpoint novo na aplicação:
+# a chamada vai direto ao Supabase.
+#
+# DETALHES PARA QUEM FOR MEXER DEPOIS
+#  - A chave usada é a anon/publishable (a mesma que roda no browser, protegida
+#    por RLS). NUNCA use a service_role aqui: secrets de Actions ficam
+#    acessíveis a qualquer workflow do repositório.
+#  - A chave vem do secret SUPABASE_ANON_KEY
+#    (Settings > Secrets and variables > Actions). Não coloque a chave no YAML.
+#  - Cron do GitHub Actions é sempre UTC. 09:00 em America/Sao_Paulo (UTC-3,
+#    sem horário de verão desde 2019) equivale a 12:00 UTC.
+#  - Atenção: o GitHub desativa workflows agendados após ~60 dias sem commits
+#    no repositório. Se o projeto ficar parado, reative o workflow na aba
+#    Actions (ou rode o workflow_dispatch) para o keep-alive voltar a rodar.
+
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # 12:00 UTC = 09:00 America/Sao_Paulo
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keep-alive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    name: Ping REST API
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_ENDPOINT: "https://finkazcfuadukylmrqyh.supabase.co/rest/v1/categorias?select=id&limit=1"
+
+    steps:
+      - name: Consultar Supabase
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_ANON_KEY:-}" ]; then
+            echo "::error::O secret SUPABASE_ANON_KEY não está configurado. Cadastre-o em Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+          echo "Endpoint: ${SUPABASE_ENDPOINT}"
+
+          # --retry cobre instabilidade momentânea de rede sem mascarar um
+          # projeto realmente pausado (que responde erro de forma consistente).
+          http_code="$(curl --silent --show-error \
+            --max-time 30 --retry 3 --retry-delay 10 --retry-all-errors \
+            --output resposta.json --write-out '%{http_code}' \
+            --header "apikey: ${SUPABASE_ANON_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_ENDPOINT}")"
+
+          echo "HTTP status: ${http_code}"
+          echo "Resposta:"
+          cat resposta.json
+          echo
+
+          if [ "${http_code}" != "200" ]; then
+            echo "::error::Keep-alive falhou: esperado HTTP 200, recebido ${http_code}. O projeto Supabase pode estar pausado ou a chave anon pode ter sido rotacionada."
+            exit 1
+          fi
+
+          echo "::notice::Keep-alive OK — projeto Supabase respondeu 200."
