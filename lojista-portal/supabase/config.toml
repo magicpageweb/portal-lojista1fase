@@ -1,1 +1,6 @@
-project_id = "dosuwmurijxkxgouifbx"
+# Projeto Supabase de destino do CLI (supabase link / db push).
+#
+# Deve acompanhar o ref usado em runtime (.env.production, src/config/supabase.demo.ts).
+# O scaffold original usava "dosuwmurijxkxgouifbx" (sem dados de produção).
+# Produção / Vercel / domínio lojista.sindilojas-scs.com.br usam:
+project_id = "finkazcfuadukylmrqyh"
