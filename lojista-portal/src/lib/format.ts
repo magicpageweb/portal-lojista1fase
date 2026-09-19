@@ -35,6 +35,9 @@ export function formatPhone(raw: string | null | undefined): string {
 export function publicImage(path: string | null | undefined, fallback?: string): string | undefined {
   if (!path) return fallback;
   if (path.startsWith("http")) return path;
+  // Caminho absoluto = asset servido pelo próprio portal (ex.: /demo/... em public/),
+  // sem passar pelo Supabase Storage.
+  if (path.startsWith("/")) return path;
   const base = import.meta.env.VITE_SUPABASE_URL ?? SUPABASE_DEMO.url;
   if (!base) return fallback;
   return `${base}/storage/v1/object/public/lojistas/${path}`;

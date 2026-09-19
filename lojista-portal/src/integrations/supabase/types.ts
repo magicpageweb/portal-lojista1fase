@@ -55,6 +55,7 @@ export type Database = {
           cep: string | null
           cidade: string | null
           cnpj: string | null
+          cnpj_verificado: boolean
           complemento: string | null
           created_at: string
           descricao: string | null
@@ -66,11 +67,13 @@ export type Database = {
           galeria: Json | null
           id: string
           instagram: string | null
+          is_demo: boolean
           latitude: number | null
           logo_url: string | null
           longitude: number | null
           nome_fantasia: string
           numero: string | null
+          plano: Database["public"]["Enums"]["lojista_plano"]
           razao_social: string | null
           site: string | null
           slogan: string | null
@@ -79,7 +82,7 @@ export type Database = {
           telefone: string | null
           tiktok: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -89,6 +92,7 @@ export type Database = {
           cep?: string | null
           cidade?: string | null
           cnpj?: string | null
+          cnpj_verificado?: boolean
           complemento?: string | null
           created_at?: string
           descricao?: string | null
@@ -100,11 +104,13 @@ export type Database = {
           galeria?: Json | null
           id?: string
           instagram?: string | null
+          is_demo?: boolean
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
           nome_fantasia: string
           numero?: string | null
+          plano?: Database["public"]["Enums"]["lojista_plano"]
           razao_social?: string | null
           site?: string | null
           slogan?: string | null
@@ -113,7 +119,7 @@ export type Database = {
           telefone?: string | null
           tiktok?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -123,6 +129,7 @@ export type Database = {
           cep?: string | null
           cidade?: string | null
           cnpj?: string | null
+          cnpj_verificado?: boolean
           complemento?: string | null
           created_at?: string
           descricao?: string | null
@@ -134,11 +141,13 @@ export type Database = {
           galeria?: Json | null
           id?: string
           instagram?: string | null
+          is_demo?: boolean
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
           nome_fantasia?: string
           numero?: string | null
+          plano?: Database["public"]["Enums"]["lojista_plano"]
           razao_social?: string | null
           site?: string | null
           slogan?: string | null
@@ -147,7 +156,7 @@ export type Database = {
           telefone?: string | null
           tiktok?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Relationships: [
@@ -302,6 +311,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "lojista"
+      lojista_plano: "essencial" | "vitrine" | "destaque"
       lojista_status: "aguardando_aprovacao" | "ativo" | "inativo" | "rejeitado"
       metrica_tipo:
         | "visualizacao"

@@ -68,8 +68,11 @@ async function main(): Promise<void> {
     console.log(`  - usuário removido: ${user.email}`);
   }
 
+  // `user_id` é anulável desde a carga em lote de associados: lojas sem conta
+  // vinculada não têm usuário para remover.
   const orphanUserIds = (lojistas ?? [])
     .map((l) => l.user_id)
+    .filter((id): id is string => id !== null)
     .filter((id) => !demoUsers.some((u) => u.id === id));
 
   for (const userId of orphanUserIds) {
