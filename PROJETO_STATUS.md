@@ -3,29 +3,24 @@
 > **Para que serve este arquivo:** contexto vivo do projeto, para não precisar
 > recolar histórico a cada sessão. **Atualize ao final de cada sessão de trabalho.**
 
-- **Última atualização:** 2026-09-19 (pós-migration + seed 18)
-- **Branch de trabalho:** `cursor/planos-demo-keepalive-1a92` (ainda **não mergeada** na `main`)
+- **Última atualização:** 2026-09-19 (merge na main + deploy produção)
+- **Branch de trabalho:** `cursor/planos-demo-keepalive-1a92` — **mergeada na `main`** (`a247893`)
 - **Prazo:** apresentação à diretoria em **28/09**
-- **Produção:** https://lojista.sindilojas-scs.com.br
+- **Produção:** https://lojista.sindilojas-scs.com.br (banner + 18 demos OK)
 - **Projeto Supabase de produção:** `finkazcfuadukylmrqyh`
-- **Preview local da branch:** http://localhost:8080/ (banner + 18 demos OK)
 
 ---
 
 ## 1. Onde o projeto está agora (resumo de 30 segundos)
 
-**Banco de produção já tem** a migration de planos e as **18 lojas demo**
-(`is_demo=true`, distribuição 8 essencial / 7 vitrine / 3 destaque). As 8 demos
-antigas foram removidas.
-
-**Código da branch** ainda **não está na `main`** — o site público
-(lojista.sindilojas-scs.com.br) só passa a exibir banner e UI da branch após o merge.
-No preview local da branch o banner e as lojas já aparecem.
+**Banco e site de produção** já refletem o plano demo: migration aplicada,
+**18 lojas** (`is_demo=true`, 8/7/3), banner de implantação no ar.
+Deploy Vercel Production disparado automaticamente pelo push na `main`.
 
 Lacunas restantes para o dia 28:
 
 1. **UI ainda não diferencia bem os planos** (selo/ordenação/esconder catálogo no Essencial) — ver §5.1.
-2. Merge na `main` + secret `SUPABASE_ANON_KEY` para keep-alive — ver §5.4–5.5.
+2. Secret `SUPABASE_ANON_KEY` + testar `workflow_dispatch` do keep-alive — ver §5.5.
 
 ---
 
@@ -90,9 +85,10 @@ Arquivo: `lojista-portal/supabase/migrations/20260919130000_add_plano_is_demo_an
 | Distribuição | **essencial 8 / vitrine 7 / destaque 3** (33 produtos) |
 | 8 demos antigas removidas? | **SIM** (lojistas + usuários `@portaldolojista.demo`) |
 | Banner no preview local da branch? | **SIM** |
-| Banner no domínio público (`main`)? | **NÃO** — falta merge |
+| Banner no domínio público (`main`)? | **SIM** — confirmado pós-deploy `a247893` |
 | Secret `SUPABASE_ANON_KEY`? | **Pendente** (cadastro manual) |
-| `config.toml` → `finkazcfuadukylmrqyh`? | **SIM** (main + branch) |
+| `config.toml` → `finkazcfuadukylmrqyh`? | **SIM** (main) |
+| Deploy automático a partir da `main`? | **SIM** — push `main` gerou Deployment Production success |
 
 ---
 
@@ -113,13 +109,13 @@ A palavra `plano` ainda quase não aparece no frontend. Falta para a apresentaç
 
 ### 5.4 Mergear a branch na `main`
 
-**Aguardando confirmação explícita** após preview. O keep-alive só agenda na `main`.
+**Concluído** (`a247893`). Keep-alive workflow agora está no branch padrão.
 
-### 5.5 Cadastrar o secret `SUPABASE_ANON_KEY` — manual
+### 5.5 Cadastrar o secret `SUPABASE_ANON_KEY` — manual (PENDENTE)
 
 Settings → Secrets and variables → Actions → `SUPABASE_ANON_KEY` =
-chave anon de `lojista-portal/.env.production`. Depois do merge, validar com
-`workflow_dispatch`.
+chave anon de `lojista-portal/.env.production`. Depois, validar com
+`workflow_dispatch` na aba Actions → **Supabase Keep-Alive**.
 
 ---
 
