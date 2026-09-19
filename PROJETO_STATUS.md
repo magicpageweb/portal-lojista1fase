@@ -3,7 +3,7 @@
 > **Para que serve este arquivo:** contexto vivo do projeto, para não precisar
 > recolar histórico a cada sessão. **Atualize ao final de cada sessão de trabalho.**
 
-- **Última atualização:** 2026-09-19 (merge na main + deploy produção)
+- **Última atualização:** 2026-09-19 (keep-alive secret + workflow_dispatch OK)
 - **Branch de trabalho:** `cursor/planos-demo-keepalive-1a92` — **mergeada na `main`** (`a247893`)
 - **Prazo:** apresentação à diretoria em **28/09**
 - **Produção:** https://lojista.sindilojas-scs.com.br (banner + 18 demos OK)
@@ -20,7 +20,6 @@ Deploy Vercel Production disparado automaticamente pelo push na `main`.
 Lacunas restantes para o dia 28:
 
 1. **UI ainda não diferencia bem os planos** (selo/ordenação/esconder catálogo no Essencial) — ver §5.1.
-2. Secret `SUPABASE_ANON_KEY` + testar `workflow_dispatch` do keep-alive — ver §5.5.
 
 ---
 
@@ -72,7 +71,7 @@ Arquivo: `lojista-portal/supabase/migrations/20260919130000_add_plano_is_demo_an
 ### 3.4 Keep-alive
 
 - `.github/workflows/supabase-keep-alive.yml` — cron 12:00 UTC + `workflow_dispatch`
-- Secret necessário: `SUPABASE_ANON_KEY` (ainda pendente de cadastro manual)
+- Secret `SUPABASE_ANON_KEY`: cadastrado e validado via `workflow_dispatch`
 
 ---
 
@@ -86,7 +85,7 @@ Arquivo: `lojista-portal/supabase/migrations/20260919130000_add_plano_is_demo_an
 | 8 demos antigas removidas? | **SIM** (lojistas + usuários `@portaldolojista.demo`) |
 | Banner no preview local da branch? | **SIM** |
 | Banner no domínio público (`main`)? | **SIM** — confirmado pós-deploy `a247893` |
-| Secret `SUPABASE_ANON_KEY`? | **Pendente** (cadastro manual) |
+| Secret `SUPABASE_ANON_KEY`? | **SIM** — cadastrado; `workflow_dispatch` success |
 | `config.toml` → `finkazcfuadukylmrqyh`? | **SIM** (main) |
 | Deploy automático a partir da `main`? | **SIM** — push `main` gerou Deployment Production success |
 
@@ -111,11 +110,12 @@ A palavra `plano` ainda quase não aparece no frontend. Falta para a apresentaç
 
 **Concluído** (`a247893`). Keep-alive workflow agora está no branch padrão.
 
-### 5.5 Cadastrar o secret `SUPABASE_ANON_KEY` — manual (PENDENTE)
+### 5.5 Cadastrar o secret `SUPABASE_ANON_KEY` — manual
 
-Settings → Secrets and variables → Actions → `SUPABASE_ANON_KEY` =
-chave anon de `lojista-portal/.env.production`. Depois, validar com
-`workflow_dispatch` na aba Actions → **Supabase Keep-Alive**.
+**Concluído.** Secret no repositório + run manual verde:
+https://github.com/magicpageweb/portal-lojista1fase/actions/runs/35465148502
+
+O cron diário (12:00 UTC / 09:00 São Paulo) passa a rodar sozinho.
 
 ---
 
