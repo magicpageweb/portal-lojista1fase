@@ -1,11 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Check, X, Store, Eye, MessageCircle, MapPin, Users, ShieldOff } from "lucide-react";
+import { Check, Pencil, X, Store, Eye, Users, ShieldOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardShell } from "@/components/dashboard-shell";
+import { AdminEditLojistaDialog } from "@/components/admin-edit-lojista-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { publicImage } from "@/lib/format";
@@ -16,21 +18,21 @@ export const Route = createFileRoute("/_authenticated/admin/")({
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
 
-    const { data: role } = await supabase
+    const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", data.user.id)
-      .eq("role", "admin")
-      .maybeSingle();
+      .eq("user_id", data.user.id);
 
-    if (!role) throw redirect({ to: "/dashboard" });
+    const canAccess = (roles ?? []).some((r) => r.role === "admin" || r.role === "gerente");
+    if (!canAccess) throw redirect({ to: "/dashboard" });
   },
   component: AdminPage,
 });
 
 function AdminPage() {
-  const { isAdmin, loading } = useAuth();
+  const { isStaff, loading } = useAuth();
   const qc = useQueryClient();
+  const [editId, setEditId] = useState<string | null>(null);
 
   const { data: stats } = useQuery({
     queryKey: ["admin-stats"],
@@ -48,13 +50,15 @@ function AdminPage() {
         aprov: aprov.count ?? 0,
       };
     },
-    enabled: isAdmin,
+    enabled: isStaff,
   });
 
   const { data: lojistas = [] } = useQuery({
     queryKey: ["admin-lojistas"],
-    queryFn: async () => (await supabase.from("lojistas").select("*, categorias(nome)").order("created_at", { ascending: false })).data ?? [],
-    enabled: isAdmin,
+    queryFn: async () =>
+      (await supabase.from("lojistas").select("*, categorias(nome)").order("created_at", { ascending: false })).data ??
+      [],
+    enabled: isStaff,
   });
 
   const updateStatus = async (id: string, status: "ativo" | "inativo" | "rejeitado" | "aguardando_aprovacao") => {
@@ -72,13 +76,13 @@ function AdminPage() {
   };
 
   if (loading) return <DashboardShell title="Admin">Carregando...</DashboardShell>;
-  if (!isAdmin) {
+  if (!isStaff) {
     return (
       <DashboardShell title="Admin">
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-12 text-center">
           <ShieldOff className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 font-display text-xl font-semibold">Acesso restrito</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Você não possui permissão de administrador.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Você não possui permissão de administrador ou gerente.</p>
         </div>
       </DashboardShell>
     );
@@ -104,15 +108,31 @@ function AdminPage() {
           <TabsTrigger value="inativos">Inativos ({inativos.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="aprov" className="mt-4">
-          <LojistaList lojistas={aguardando} onApprove={(id: string) => updateStatus(id, "ativo")} onReject={(id: string) => updateStatus(id, "rejeitado")} />
+          <LojistaList
+            lojistas={aguardando}
+            onEdit={setEditId}
+            onApprove={(id: string) => updateStatus(id, "ativo")}
+            onReject={(id: string) => updateStatus(id, "rejeitado")}
+          />
         </TabsContent>
         <TabsContent value="ativos" className="mt-4">
-          <LojistaList lojistas={ativos} onToggleDestaque={toggleDestaque} onDeactivate={(id: string) => updateStatus(id, "inativo")} />
+          <LojistaList
+            lojistas={ativos}
+            onEdit={setEditId}
+            onToggleDestaque={toggleDestaque}
+            onDeactivate={(id: string) => updateStatus(id, "inativo")}
+          />
         </TabsContent>
         <TabsContent value="inativos" className="mt-4">
-          <LojistaList lojistas={inativos} onActivate={(id: string) => updateStatus(id, "ativo")} />
+          <LojistaList lojistas={inativos} onEdit={setEditId} onActivate={(id: string) => updateStatus(id, "ativo")} />
         </TabsContent>
       </Tabs>
+
+      <AdminEditLojistaDialog
+        lojistaId={editId}
+        open={!!editId}
+        onOpenChange={(o) => !o && setEditId(null)}
+      />
     </DashboardShell>
   );
 }
@@ -121,11 +141,13 @@ function StatCard({ icon: Icon, label, value, highlight }: any) {
   return (
     <Card className={highlight ? "border-primary shadow-gold" : ""}>
       <CardContent className="flex items-center gap-3 p-5">
-        <span className={`grid h-10 w-10 place-items-center rounded-lg ${highlight ? "gradient-gold text-secondary" : "bg-secondary/10 text-secondary"}`}>
+        <span
+          className={`grid h-10 w-10 place-items-center rounded-lg ${highlight ? "gradient-gold text-secondary" : "bg-secondary/10 text-secondary"}`}
+        >
           <Icon className="h-5 w-5" />
         </span>
         <div>
-          <p className="text-2xl font-bold font-display">{value}</p>
+          <p className="font-display text-2xl font-bold">{value}</p>
           <p className="text-xs text-muted-foreground">{label}</p>
         </div>
       </CardContent>
@@ -133,9 +155,13 @@ function StatCard({ icon: Icon, label, value, highlight }: any) {
   );
 }
 
-function LojistaList({ lojistas, onApprove, onReject, onActivate, onDeactivate, onToggleDestaque }: any) {
+function LojistaList({ lojistas, onEdit, onApprove, onReject, onActivate, onDeactivate, onToggleDestaque }: any) {
   if (lojistas.length === 0) {
-    return <p className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">Nada por aqui.</p>;
+    return (
+      <p className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
+        Nada por aqui.
+      </p>
+    );
   }
   return (
     <div className="space-y-3">
@@ -145,23 +171,61 @@ function LojistaList({ lojistas, onApprove, onReject, onActivate, onDeactivate, 
           <Card key={l.id}>
             <CardContent className="flex flex-wrap items-center gap-4 p-4">
               <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-lg bg-muted">
-                {logo ? <img src={logo} alt="" className="h-full w-full object-cover" /> : <Store className="h-5 w-5 text-muted-foreground" />}
+                {logo ? (
+                  <img src={logo} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <Store className="h-5 w-5 text-muted-foreground" />
+                )}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold">{l.nome_fantasia}</h3>
-                  {l.destaque && <Badge className="gradient-gold text-secondary">Destaque</Badge>}
+                  {l.plano === "destaque" || l.destaque ? (
+                    <Badge className="gradient-gold border-0 text-secondary">Destaque</Badge>
+                  ) : l.plano === "vitrine" ? (
+                    <Badge variant="outline" className="border-primary/35 text-primary">
+                      Vitrine
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">Essencial</Badge>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground">{l.categorias?.nome ?? "Sem categoria"} · {l.cidade ?? "-"} · CNPJ {l.cnpj ?? "—"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {l.categorias?.nome ?? "Sem categoria"} · {l.cidade ?? "-"} · CNPJ {l.cnpj ?? "—"}
+                </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {onApprove && <Button size="sm" onClick={() => onApprove(l.id)} className="bg-emerald-500 hover:bg-emerald-600"><Check className="mr-1 h-4 w-4" /> Aprovar</Button>}
-                {onReject && <Button size="sm" variant="outline" onClick={() => onReject(l.id)}><X className="mr-1 h-4 w-4" /> Rejeitar</Button>}
-                {onActivate && <Button size="sm" onClick={() => onActivate(l.id)} className="bg-emerald-500 hover:bg-emerald-600">Reativar</Button>}
-                {onDeactivate && <Button size="sm" variant="outline" onClick={() => onDeactivate(l.id)}>Desativar</Button>}
+                <Button size="sm" variant="outline" onClick={() => onEdit(l.id)}>
+                  <Pencil className="mr-1 h-4 w-4" /> Editar
+                </Button>
+                {onApprove && (
+                  <Button size="sm" onClick={() => onApprove(l.id)} className="bg-emerald-500 hover:bg-emerald-600">
+                    <Check className="mr-1 h-4 w-4" /> Aprovar
+                  </Button>
+                )}
+                {onReject && (
+                  <Button size="sm" variant="outline" onClick={() => onReject(l.id)}>
+                    <X className="mr-1 h-4 w-4" /> Rejeitar
+                  </Button>
+                )}
+                {onActivate && (
+                  <Button size="sm" onClick={() => onActivate(l.id)} className="bg-emerald-500 hover:bg-emerald-600">
+                    Reativar
+                  </Button>
+                )}
+                {onDeactivate && (
+                  <Button size="sm" variant="outline" onClick={() => onDeactivate(l.id)}>
+                    Desativar
+                  </Button>
+                )}
                 {onToggleDestaque && (
-                  <Button size="sm" variant={l.destaque ? "default" : "outline"} onClick={() => onToggleDestaque(l.id, !l.destaque)} className={l.destaque ? "gradient-gold text-secondary" : ""}>
-                    {l.destaque ? "Remover destaque" : "Destacar"}
+                  <Button
+                    size="sm"
+                    variant={l.destaque || l.plano === "destaque" ? "default" : "outline"}
+                    onClick={() => onToggleDestaque(l.id, !(l.destaque || l.plano === "destaque"))}
+                    className={l.destaque || l.plano === "destaque" ? "gradient-gold text-secondary" : ""}
+                  >
+                    {l.destaque || l.plano === "destaque" ? "Remover destaque" : "Destacar"}
                   </Button>
                 )}
               </div>

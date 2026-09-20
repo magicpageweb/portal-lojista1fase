@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { ReactNode } from "react";
 
 export function DashboardShell({ children, title }: { children: ReactNode; title?: string }) {
-  const { isAdmin } = useAuth();
+  const { isStaff } = useAuth();
   const navigate = useNavigate();
 
   const signOut = async () => {
@@ -26,7 +26,7 @@ export function DashboardShell({ children, title }: { children: ReactNode; title
         <nav className="flex-1 space-y-1 p-3">
           <NavItem to="/dashboard" icon={LayoutDashboard} label="Minha loja" />
           <NavItem to="/dashboard/produtos" icon={Box} label="Produtos" />
-          {isAdmin && (
+          {isStaff && (
             <>
               <div className="mt-6 px-3 text-xs font-semibold uppercase text-secondary-foreground/50">Admin</div>
               <NavItem to="/admin" icon={Shield} label="Painel Admin" />
