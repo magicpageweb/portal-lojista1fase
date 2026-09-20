@@ -48,6 +48,11 @@ export function AdminEditLojistaDialog({ lojistaId, open, onOpenChange }: Props)
     queryFn: async () => (await supabase.from("categorias").select("*").order("ordem")).data ?? [],
   });
 
+  const { data: cidades = [] } = useQuery({
+    queryKey: ["cidades"],
+    queryFn: async () => (await supabase.from("cidades").select("id, nome, uf, slug").order("ordem")).data ?? [],
+  });
+
   const { data: lojista, isLoading } = useQuery({
     queryKey: ["admin-edit-lojista", lojistaId],
     enabled: open && !!lojistaId,
@@ -72,6 +77,11 @@ export function AdminEditLojistaDialog({ lojistaId, open, onOpenChange }: Props)
   const handleChange = (key: string, value: string) => {
     setForm((prev) => (prev ? { ...prev, [key]: formatLojistaField(key, value) } : prev));
     if (errors[key]) setErrors((e) => ({ ...e, [key]: "" }));
+  };
+
+  const handlePatch = (patch: Partial<LojistaFormValues>) => {
+    setForm((prev) => (prev ? { ...prev, ...patch } : prev));
+    if (patch.cidade_id && errors.cidade) setErrors((e) => ({ ...e, cidade: "" }));
   };
 
   const requestPlanoChange = (plano: LojistaPlano) => {
@@ -128,7 +138,9 @@ export function AdminEditLojistaDialog({ lojistaId, open, onOpenChange }: Props)
                 form={form}
                 errors={errors}
                 cats={cats}
+                cidades={cidades}
                 onChange={handleChange}
+                onPatch={handlePatch}
                 uploadFolder={form.id ?? "staff"}
                 staffMode
                 onPlanoChange={requestPlanoChange}

@@ -1,5 +1,5 @@
 /**
- * Carga do catálogo de demonstração (18 lojistas fictícios).
+ * Carga do catálogo de demonstração (24 lojistas fictícios).
  *
  * SEGURANÇA
  *  - Usa a SUPABASE_SERVICE_ROLE_KEY, que ignora RLS. Rode apenas localmente,
@@ -15,13 +15,13 @@
  * Os registros entram com `is_demo = true` e sem `user_id` (nenhuma conta de
  * acesso é criada). O `--purge` apaga exatamente `is_demo = true`, então
  * associados reais nunca são atingidos.
+ * Substituir a carga atual: `--purge --confirm` e depois `--confirm`.
  */
 
 import { pathToFileURL } from "node:url";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../src/integrations/supabase/types";
 import {
-  DEMO_CITY,
   DEMO_LOJISTAS,
   DEMO_STATE,
   demoCapaPath,
@@ -39,16 +39,34 @@ const args = new Set(process.argv.slice(2));
 const CONFIRMED = args.has("--confirm");
 const PURGE = args.has("--purge");
 
+const CIDADE_NOME: Record<string, string> = {
+  "santa-cruz-do-sul": "Santa Cruz do Sul",
+  "vera-cruz": "Vera Cruz",
+  "venancio-aires": "Venâncio Aires",
+  "mato-leitao": "Mato Leitão",
+  herveiras: "Herveiras",
+  "gramado-xavier": "Gramado Xavier",
+  "vale-do-sol": "Vale do Sol",
+  sinimbu: "Sinimbu",
+};
+
 function resumo(): string {
   const porPlano = DEMO_LOJISTAS.reduce<Record<string, number>>((acc, l) => {
     acc[l.plano] = (acc[l.plano] ?? 0) + 1;
     return acc;
   }, {});
+  const porCidade = DEMO_LOJISTAS.reduce<Record<string, number>>((acc, l) => {
+    acc[l.cidadeSlug] = (acc[l.cidadeSlug] ?? 0) + 1;
+    return acc;
+  }, {});
   const produtos = DEMO_LOJISTAS.reduce((n, l) => n + l.produtos.length, 0);
+  const cidadesResumo = Object.entries(porCidade)
+    .map(([slug, n]) => `${slug}:${n}`)
+    .join(", ");
   return (
     `${DEMO_LOJISTAS.length} lojistas ` +
     `(essencial ${porPlano.essencial ?? 0} / vitrine ${porPlano.vitrine ?? 0} / destaque ${porPlano.destaque ?? 0}), ` +
-    `${produtos} produtos`
+    `${produtos} produtos | cidades: ${cidadesResumo}`
   );
 }
 
@@ -58,8 +76,20 @@ async function carregarCategorias(admin: Admin): Promise<Map<string, string>> {
   return new Map((data ?? []).map((c) => [c.slug, c.id]));
 }
 
-export function montarLojista(loja: DemoLojista, seq: number, categoriaId: string) {
+async function carregarCidades(admin: Admin): Promise<Map<string, { id: string; nome: string }>> {
+  const { data, error } = await admin.from("cidades").select("id, slug, nome");
+  if (error) throw error;
+  return new Map((data ?? []).map((c) => [c.slug, { id: c.id, nome: c.nome }]));
+}
+
+export function montarLojista(
+  loja: DemoLojista,
+  seq: number,
+  categoriaId: string,
+  cidade?: { id: string; nome: string } | null,
+) {
   const pago = loja.plano !== "essencial";
+  const cidadeNome = cidade?.nome ?? CIDADE_NOME[loja.cidadeSlug] ?? "Santa Cruz do Sul";
   return {
     user_id: null,
     slug: loja.slug,
@@ -68,8 +98,9 @@ export function montarLojista(loja: DemoLojista, seq: number, categoriaId: strin
     cnpj: demoCnpj(seq),
     cnpj_verificado: false,
     categoria_id: categoriaId,
+    cidade_id: cidade?.id ?? null,
     bairro: loja.bairro,
-    cidade: DEMO_CITY,
+    cidade: cidadeNome,
     estado: DEMO_STATE,
     telefone: loja.telefone,
     whatsapp: loja.whatsapp,
@@ -120,12 +151,22 @@ async function purge(admin: Admin): Promise<void> {
 
 async function seed(admin: Admin): Promise<void> {
   const categorias = await carregarCategorias(admin);
+  const cidades = await carregarCidades(admin);
 
   const faltando = [...new Set(DEMO_LOJISTAS.map((l) => l.categoriaSlug))].filter(
     (slug) => !categorias.has(slug),
   );
   if (faltando.length > 0) {
     throw new Error(`Categorias ausentes no banco: ${faltando.join(", ")}`);
+  }
+
+  const cidadesFaltando = [...new Set(DEMO_LOJISTAS.map((l) => l.cidadeSlug))].filter(
+    (slug) => !cidades.has(slug),
+  );
+  if (cidadesFaltando.length > 0) {
+    throw new Error(
+      `Cidades ausentes no banco (rode a migration de cidades antes): ${cidadesFaltando.join(", ")}`,
+    );
   }
 
   const { data: existentes, error: existentesErr } = await admin
@@ -142,22 +183,39 @@ async function seed(admin: Admin): Promise<void> {
   console.log(`\nJá cadastrados: ${jaExiste.size} | A inserir: ${pendentes.length}`);
 
   if (!CONFIRMED) {
-    console.log("\n-- DRY-RUN: prévia dos registros (nada foi escrito) --");
-    for (const loja of pendentes) {
-      const seq = DEMO_LOJISTAS.indexOf(loja) + 1;
-      const linha = montarLojista(loja, seq, categorias.get(loja.categoriaSlug)!);
+    console.log("\n-- DRY-RUN: catálogo completo no código (24) --");
+    for (const loja of DEMO_LOJISTAS) {
+      const status = jaExiste.has(loja.slug) ? "já no banco" : "NOVO";
       console.log(
-        `  [${linha.plano.padEnd(9)}] ${linha.nome_fantasia} — ${loja.categoriaSlug} / ${linha.bairro} — ` +
-          `CNPJ ${linha.cnpj} — logo:${linha.logo_url ? "sim" : "não"} — produtos:${loja.produtos.length}`,
+        `  [${loja.plano.padEnd(9)}] ${loja.cidadeSlug.padEnd(18)} ${loja.categoriaSlug.padEnd(18)} ` +
+          `${loja.nome_fantasia} (${status}) bairro:${loja.bairro}`,
       );
     }
-    console.log("\nPara aplicar de verdade: npx tsx scripts/seed-demo-lojistas.ts --confirm");
+    if (jaExiste.size > 0) {
+      console.log(
+        "\nATENÇÃO: --confirm sozinho só INSERE os novos e NÃO corrige categoria/plano/cidade das lojas já existentes.",
+      );
+      console.log(
+        "Para substituir a carga demo inteira: npx tsx scripts/seed-demo-lojistas.ts --purge --confirm",
+      );
+      console.log("e em seguida: npx tsx scripts/seed-demo-lojistas.ts --confirm");
+      console.log(
+        "Ou aplique a migration 20260920010100_redistribute_demo_lojistas_cidades.sql para só redistribuir cidades.",
+      );
+    } else {
+      console.log("\nPara aplicar de verdade: npx tsx scripts/seed-demo-lojistas.ts --confirm");
+    }
     return;
   }
 
   for (const loja of pendentes) {
     const seq = DEMO_LOJISTAS.indexOf(loja) + 1;
-    const payload = montarLojista(loja, seq, categorias.get(loja.categoriaSlug)!);
+    const payload = montarLojista(
+      loja,
+      seq,
+      categorias.get(loja.categoriaSlug)!,
+      cidades.get(loja.cidadeSlug),
+    );
 
     const { data: inserido, error: insErr } = await admin
       .from("lojistas")
@@ -166,7 +224,7 @@ async function seed(admin: Admin): Promise<void> {
       .single();
     if (insErr) throw insErr;
 
-    console.log(`  + [${loja.plano}] ${loja.nome_fantasia}`);
+    console.log(`  + [${loja.plano}] ${loja.cidadeSlug} — ${loja.nome_fantasia}`);
 
     if (loja.produtos.length === 0) continue;
 

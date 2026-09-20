@@ -47,6 +47,39 @@ export type Database = {
         }
         Relationships: []
       }
+      cidades: {
+        Row: {
+          created_at: string
+          id: string
+          meta_description: string | null
+          nome: string
+          ordem: number
+          slug: string
+          uf: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          nome: string
+          ordem?: number
+          slug: string
+          uf?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          nome?: string
+          ordem?: number
+          slug?: string
+          uf?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lojistas: {
         Row: {
           bairro: string | null
@@ -54,6 +87,7 @@ export type Database = {
           categoria_id: string | null
           cep: string | null
           cidade: string | null
+          cidade_id: string | null
           cnpj: string | null
           cnpj_verificado: boolean
           complemento: string | null
@@ -91,6 +125,7 @@ export type Database = {
           categoria_id?: string | null
           cep?: string | null
           cidade?: string | null
+          cidade_id?: string | null
           cnpj?: string | null
           cnpj_verificado?: boolean
           complemento?: string | null
@@ -128,6 +163,7 @@ export type Database = {
           categoria_id?: string | null
           cep?: string | null
           cidade?: string | null
+          cidade_id?: string | null
           cnpj?: string | null
           cnpj_verificado?: boolean
           complemento?: string | null
@@ -165,6 +201,13 @@ export type Database = {
             columns: ["categoria_id"]
             isOneToOne: false
             referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lojistas_cidade_id_fkey"
+            columns: ["cidade_id"]
+            isOneToOne: false
+            referencedRelation: "cidades"
             referencedColumns: ["id"]
           },
         ]

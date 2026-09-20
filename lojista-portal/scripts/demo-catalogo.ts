@@ -1,5 +1,5 @@
 /**
- * Catálogo fictício para a apresentação à diretoria (18 lojistas).
+ * Catálogo fictício para a apresentação à diretoria (24 lojistas).
  *
  * Todos os registros entram com `is_demo = true`, o que permite remover a carga
  * inteira depois com um único comando, sem risco de atingir associados reais.
@@ -7,13 +7,12 @@
  * Convenções propositalmente reconhecíveis como teste:
  *  - nomes genéricos ("Loja Modelo", "Exemplo ...") — nunca algo que lembre
  *    uma empresa real da cidade;
- *  - CNPJ sempre começando com 00 (dígitos verificadores calculados, então
- *    passam na validação do painel);
+ *  - CNPJ sempre começando com 00 (dígitos verificadores calculados);
  *  - e-mails no domínio reservado @demo.sindilojas.local;
  *  - slug com prefixo `demo-`.
  *
- * As imagens reaproveitam as pastas já versionadas em `public/demo/`, servidas
- * pelo próprio portal — a carga não depende de upload no Supabase Storage.
+ * Distribuição (mín. 2 por categoria, ≥1 pago com foto em cada):
+ *  4 destaque + 8 vitrine + 12 essencial = 24
  */
 
 export const DEMO_CITY = "Santa Cruz do Sul";
@@ -40,6 +39,8 @@ export type DemoLojista = {
   destaque: boolean;
   categoriaSlug: string;
   bairro: string;
+  /** Slug da cidade de atuação (tabela public.cidades). */
+  cidadeSlug: string;
   telefone: string;
   whatsapp: string;
   /** Planos pagos: pasta em public/demo/ usada para logo, capa e produtos. */
@@ -54,12 +55,7 @@ export type DemoLojista = {
   produtos: DemoProduto[];
 };
 
-// ---------------------------------------------------------------------------
-// CNPJ de teste: base "00" + sequência, com dígitos verificadores reais.
-// ---------------------------------------------------------------------------
-
 function cnpjCheckDigit(base: string): number {
-  // Pesos 2..9 aplicados da direita para a esquerda.
   let sum = 0;
   let weight = 2;
   for (let i = base.length - 1; i >= 0; i--) {
@@ -95,12 +91,20 @@ export function demoProdutoPath(pasta: string, imagem: number): string {
   return `/demo/${pasta}/produtos/${imagem}.webp`;
 }
 
+const produtoExemplo = (nome: string, preco: number, imagem: number, ordem: number): DemoProduto => ({
+  nome,
+  descricao: "Item de exemplo para a vitrine.",
+  preco,
+  imagem,
+  ordem,
+});
+
 // ---------------------------------------------------------------------------
-// 3 destaque + 7 vitrine + 8 essencial = 18
+// 4 destaque + 8 vitrine + 12 essencial = 24
 // ---------------------------------------------------------------------------
 
 export const DEMO_LOJISTAS: DemoLojista[] = [
-  // ======================= DESTAQUE (3) =======================
+  // ======================= DESTAQUE (4) =======================
   {
     slug: "demo-loja-modelo-vestuario",
     nome_fantasia: "Loja Modelo Vestuário",
@@ -108,6 +112,7 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "destaque",
     destaque: true,
     categoriaSlug: "moda",
+    cidadeSlug: "santa-cruz-do-sul",
     bairro: "Centro",
     endereco: "Rua de Demonstração",
     numero: "100",
@@ -121,34 +126,10 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Destaque. Loja de vestuário com coleções de estação, provador assistido e atendimento personalizado. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Vestido Demonstração Midi",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 189.9,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Blusa Demonstração Linho",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 79.9,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Calça Demonstração Wide Leg",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 129.9,
-        imagem: 3,
-        ordem: 3,
-      },
-      {
-        nome: "Bolsa Demonstração Tiracolo",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 99.9,
-        imagem: 4,
-        ordem: 4,
-      },
+      produtoExemplo("Vestido Demonstração Midi", 189.9, 1, 1),
+      produtoExemplo("Blusa Demonstração Linho", 79.9, 2, 2),
+      produtoExemplo("Calça Demonstração Wide Leg", 129.9, 3, 3),
+      produtoExemplo("Bolsa Demonstração Tiracolo", 99.9, 4, 4),
     ],
   },
   {
@@ -158,7 +139,8 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "destaque",
     destaque: true,
     categoriaSlug: "alimentacao",
-    bairro: "Higienópolis",
+    cidadeSlug: "mato-leitao",
+    bairro: "Centro",
     endereco: "Avenida de Demonstração",
     numero: "220",
     cep: "96815-000",
@@ -171,34 +153,10 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Destaque. Padaria de bairro com produção própria, cafeteria e encomendas para eventos. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Pão Demonstração Artesanal",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 18.9,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Bolo Demonstração Caseiro",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 42.0,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Croissant Demonstração",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 9.5,
-        imagem: 3,
-        ordem: 3,
-      },
-      {
-        nome: "Cesta Demonstração Café",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 74.9,
-        imagem: 4,
-        ordem: 4,
-      },
+      produtoExemplo("Pão Demonstração Artesanal", 18.9, 1, 1),
+      produtoExemplo("Bolo Demonstração Caseiro", 42.0, 2, 2),
+      produtoExemplo("Croissant Demonstração", 9.5, 3, 3),
+      produtoExemplo("Cesta Demonstração Café", 74.9, 4, 4),
     ],
   },
   {
@@ -208,7 +166,8 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "destaque",
     destaque: true,
     categoriaSlug: "casa-decoracao",
-    bairro: "Avenida",
+    cidadeSlug: "vera-cruz",
+    bairro: "Centro",
     endereco: "Rua de Demonstração",
     numero: "340",
     cep: "96820-000",
@@ -221,31 +180,39 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Destaque. Loja de utilidades domésticas e decoração, com projeto de ambientes e entrega na região. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Luminária Demonstração",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 159.0,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Vaso Demonstração Cerâmica",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 89.0,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Jogo Demonstração Almofadas",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 119.0,
-        imagem: 3,
-        ordem: 3,
-      },
+      produtoExemplo("Luminária Demonstração Mesa", 159.0, 1, 1),
+      produtoExemplo("Vaso Demonstração Cerâmica", 89.9, 2, 2),
+      produtoExemplo("Kit Demonstração Toalhas", 119.0, 3, 3),
+    ],
+  },
+  {
+    slug: "demo-modelo-otica",
+    nome_fantasia: "Modelo Ótica",
+    razao_social: "Modelo Ótica Demonstração Ltda",
+    plano: "destaque",
+    destaque: true,
+    categoriaSlug: "otica-relojoaria",
+    cidadeSlug: "venancio-aires",
+    bairro: "Centro",
+    endereco: "Rua de Demonstração",
+    numero: "880",
+    cep: "96815-200",
+    telefone: "(51) 3000-0007",
+    whatsapp: "(51) 99000-0007",
+    site: "https://exemplo.demo.sindilojas.local",
+    instagram: "@modelootica",
+    pastaImagens: "demo-otica-prime",
+    slogan: "Registro de demonstração — ótica",
+    descricao:
+      "Registro fictício usado para demonstrar o plano Destaque. Ótica com exame de vista, lentes multifocais e ajuste de armações. Nenhum dado aqui corresponde a um associado real.",
+    produtos: [
+      produtoExemplo("Armação Demonstração Acetato", 320.0, 1, 1),
+      produtoExemplo("Óculos Demonstração Sol", 249.0, 2, 2),
+      produtoExemplo("Relógio Demonstração Pulseira", 599.0, 3, 3),
     ],
   },
 
-  // ======================= VITRINE (7) =======================
+  // ======================= VITRINE (8) =======================
   {
     slug: "demo-exemplo-calcados",
     nome_fantasia: "Exemplo Calçados",
@@ -253,9 +220,10 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "vitrine",
     destaque: false,
     categoriaSlug: "moda",
-    bairro: "Vila Nova",
+    cidadeSlug: "vera-cruz",
+    bairro: "Distrito",
     endereco: "Rua de Demonstração",
-    numero: "455",
+    numero: "45",
     cep: "96825-000",
     telefone: "(51) 3000-0004",
     whatsapp: "(51) 99000-0004",
@@ -265,27 +233,9 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Vitrine. Calçados femininos, masculinos e infantis, com numeração ampla. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Tênis Demonstração Casual",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 219.9,
-        imagem: 5,
-        ordem: 1,
-      },
-      {
-        nome: "Sandália Demonstração Verão",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 109.9,
-        imagem: 6,
-        ordem: 2,
-      },
-      {
-        nome: "Cinto Demonstração Couro",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 59.9,
-        imagem: 1,
-        ordem: 3,
-      },
+      produtoExemplo("Tênis Demonstração Casual", 199.0, 5, 1),
+      produtoExemplo("Sandália Demonstração Couro", 149.0, 6, 2),
+      produtoExemplo("Bota Demonstração Cano Baixo", 259.0, 4, 3),
     ],
   },
   {
@@ -295,10 +245,11 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "vitrine",
     destaque: false,
     categoriaSlug: "alimentacao",
-    bairro: "Santo Inácio",
+    cidadeSlug: "venancio-aires",
+    bairro: "Bairro Industrial",
     endereco: "Rua de Demonstração",
     numero: "512",
-    cep: "96830-000",
+    cep: "96810-050",
     telefone: "(51) 3000-0005",
     whatsapp: "(51) 99000-0005",
     instagram: "@demonstracaomercearia",
@@ -307,27 +258,9 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Vitrine. Mercearia de bairro com hortifrúti, frios e produtos da agricultura familiar. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Cesta Demonstração Hortifrúti",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 64.9,
-        imagem: 5,
-        ordem: 1,
-      },
-      {
-        nome: "Queijo Demonstração Colonial",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 48.0,
-        imagem: 6,
-        ordem: 2,
-      },
-      {
-        nome: "Geleia Demonstração Artesanal",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 24.9,
-        imagem: 7,
-        ordem: 3,
-      },
+      produtoExemplo("Cesta Demonstração Hortifrúti", 39.9, 5, 1),
+      produtoExemplo("Queijo Demonstração Colonial", 28.5, 6, 2),
+      produtoExemplo("Mel Demonstração Pote", 22.0, 7, 3),
     ],
   },
   {
@@ -337,10 +270,11 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "vitrine",
     destaque: false,
     categoriaSlug: "beleza-saude",
-    bairro: "Centro",
+    cidadeSlug: "santa-cruz-do-sul",
+    bairro: "Higienópolis",
     endereco: "Rua de Demonstração",
-    numero: "78",
-    cep: "96810-100",
+    numero: "710",
+    cep: "96810-120",
     telefone: "(51) 3000-0006",
     whatsapp: "(51) 99000-0006",
     instagram: "@lojaexemplobeleza",
@@ -349,69 +283,34 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Vitrine. Espaço de beleza com cabelo, estética facial e day spa por agendamento. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Pacote Demonstração Day Spa",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 289.0,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Sessão Demonstração Estética",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 149.0,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Kit Demonstração Cuidados",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 99.0,
-        imagem: 3,
-        ordem: 3,
-      },
+      produtoExemplo("Kit Demonstração Skincare", 89.0, 1, 1),
+      produtoExemplo("Shampoo Demonstração Capilar", 45.0, 2, 2),
+      produtoExemplo("Máscara Demonstração Facial", 62.0, 3, 3),
     ],
   },
   {
-    slug: "demo-modelo-otica",
-    nome_fantasia: "Modelo Ótica",
-    razao_social: "Modelo Ótica Demonstração Ltda",
+    slug: "demo-modelo-lavanderia",
+    nome_fantasia: "Modelo Lavanderia",
+    razao_social: "Modelo Lavanderia Demonstração Ltda",
     plano: "vitrine",
     destaque: false,
-    categoriaSlug: "beleza-saude",
-    bairro: "Universitário",
-    endereco: "Avenida de Demonstração",
-    numero: "915",
-    cep: "96815-100",
-    telefone: "(51) 3000-0007",
-    whatsapp: "(51) 99000-0007",
-    instagram: "@modelootica",
-    pastaImagens: "demo-otica-prime",
-    slogan: "Registro de demonstração — ótica",
+    categoriaSlug: "servicos",
+    cidadeSlug: "mato-leitao",
+    bairro: "Linha Nova",
+    endereco: "Rua de Demonstração",
+    numero: "198",
+    cep: "96840-000",
+    telefone: "(51) 3000-0018",
+    whatsapp: "(51) 99000-0018",
+    instagram: "@modelolavanderia",
+    pastaImagens: "demo-lavanderia-modelo",
+    slogan: "Registro de demonstração — lavanderia",
     descricao:
-      "Registro fictício usado para demonstrar o plano Vitrine. Ótica com exame de vista, lentes multifocais e ajuste de armações. Nenhum dado aqui corresponde a um associado real.",
+      "Registro fictício usado para demonstrar o plano Vitrine. Lavanderia com lavagem, passagem e retirada/entrega na região. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Armação Demonstração Acetato",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 349.0,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Óculos Demonstração Solar",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 259.0,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Lente Demonstração Multifocal",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 599.0,
-        imagem: 3,
-        ordem: 3,
-      },
+      produtoExemplo("Pacote Demonstração Lavagem", 49.9, 1, 1),
+      produtoExemplo("Passadoria Demonstração Peça", 18.0, 2, 2),
+      produtoExemplo("Kit Demonstração Enxoval", 89.0, 3, 3),
     ],
   },
   {
@@ -420,8 +319,9 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     razao_social: "Exemplo Assistência Técnica Demonstração Ltda",
     plano: "vitrine",
     destaque: false,
-    categoriaSlug: "servicos",
-    bairro: "Renascença",
+    categoriaSlug: "tecnologia",
+    cidadeSlug: "herveiras",
+    bairro: "Centro",
     endereco: "Rua de Demonstração",
     numero: "1240",
     cep: "96820-100",
@@ -433,34 +333,9 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Vitrine. Assistência técnica de computadores e celulares, com orçamento sem compromisso. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Serviço Demonstração Formatação",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 120.0,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Troca Demonstração de Tela",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 280.0,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Upgrade Demonstração SSD",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 410.0,
-        imagem: 3,
-        ordem: 3,
-      },
-      {
-        nome: "Limpeza Demonstração Notebook",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 95.0,
-        imagem: 4,
-        ordem: 4,
-      },
+      produtoExemplo("Serviço Demonstração Formatação", 120.0, 1, 1),
+      produtoExemplo("Troca Demonstração de Tela", 280.0, 2, 2),
+      produtoExemplo("Upgrade Demonstração SSD", 410.0, 3, 3),
     ],
   },
   {
@@ -469,11 +344,12 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     razao_social: "Demonstração Auto Serviços Exemplo Ltda",
     plano: "vitrine",
     destaque: false,
-    categoriaSlug: "servicos",
-    bairro: "Bom Jesus",
-    endereco: "Avenida de Demonstração",
-    numero: "1580",
-    cep: "96825-100",
+    categoriaSlug: "automotivo",
+    cidadeSlug: "vale-do-sol",
+    bairro: "Centro",
+    endereco: "Rua de Demonstração",
+    numero: "1500",
+    cep: "96835-000",
     telefone: "(51) 3000-0009",
     whatsapp: "(51) 99000-0009",
     pastaImagens: "demo-oficina-rota-certa",
@@ -481,27 +357,9 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Vitrine. Oficina mecânica com revisão preventiva, troca de óleo e alinhamento. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Revisão Demonstração Completa",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 390.0,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Troca Demonstração de Óleo",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 180.0,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Alinhamento Demonstração",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 130.0,
-        imagem: 3,
-        ordem: 3,
-      },
+      produtoExemplo("Revisão Demonstração Básica", 220.0, 1, 1),
+      produtoExemplo("Troca Demonstração de Óleo", 180.0, 2, 2),
+      produtoExemplo("Alinhamento Demonstração", 130.0, 3, 3),
     ],
   },
   {
@@ -510,8 +368,9 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     razao_social: "Exemplo Papelaria e Gráfica Demonstração Ltda",
     plano: "vitrine",
     destaque: false,
-    categoriaSlug: "servicos",
-    bairro: "Menino Deus",
+    categoriaSlug: "papelaria",
+    cidadeSlug: "gramado-xavier",
+    bairro: "Centro",
     endereco: "Rua de Demonstração",
     numero: "62",
     cep: "96830-100",
@@ -523,32 +382,38 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     descricao:
       "Registro fictício usado para demonstrar o plano Vitrine. Papelaria com material escolar, impressão digital e personalizados. Nenhum dado aqui corresponde a um associado real.",
     produtos: [
-      {
-        nome: "Kit Demonstração Escolar",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 139.0,
-        imagem: 1,
-        ordem: 1,
-      },
-      {
-        nome: "Impressão Demonstração A3",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 12.0,
-        imagem: 2,
-        ordem: 2,
-      },
-      {
-        nome: "Caderno Demonstração Personalizado",
-        descricao: "Item de exemplo para a vitrine.",
-        preco: 49.9,
-        imagem: 3,
-        ordem: 3,
-      },
+      produtoExemplo("Kit Demonstração Escolar", 139.0, 1, 1),
+      produtoExemplo("Impressão Demonstração A3", 12.0, 2, 2),
+      produtoExemplo("Caderno Demonstração Personalizado", 49.9, 3, 3),
+    ],
+  },
+  {
+    slug: "demo-exemplo-artigos-esportivos",
+    nome_fantasia: "Exemplo Artigos Esportivos",
+    razao_social: "Exemplo Artigos Esportivos Demonstração Ltda",
+    plano: "vitrine",
+    destaque: false,
+    categoriaSlug: "esportes",
+    cidadeSlug: "sinimbu",
+    bairro: "Centro",
+    endereco: "Rua de Demonstração",
+    numero: "430",
+    cep: "96845-000",
+    telefone: "(51) 3000-0019",
+    whatsapp: "(51) 99000-0019",
+    instagram: "@exemploesportes",
+    pastaImagens: "demo-esportes-arena",
+    slogan: "Registro de demonstração — esportes",
+    descricao:
+      "Registro fictício usado para demonstrar o plano Vitrine. Artigos esportivos, tênis e acessórios para academia e lazer. Nenhum dado aqui corresponde a um associado real.",
+    produtos: [
+      produtoExemplo("Tênis Demonstração Corrida", 299.0, 1, 1),
+      produtoExemplo("Bola Demonstração Campo", 89.0, 2, 2),
+      produtoExemplo("Garrafa Demonstração Esportiva", 49.0, 3, 3),
     ],
   },
 
-  // ======================= ESSENCIAL (8) =======================
-  // Sem logo, capa, descrição ou produtos: apenas identificação e contato.
+  // ======================= ESSENCIAL (12) =======================
   {
     slug: "demo-loja-modelo-confeccoes",
     nome_fantasia: "Loja Modelo Confecções",
@@ -556,69 +421,10 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "essencial",
     destaque: false,
     categoriaSlug: "moda",
-    bairro: "Arroio Grande",
+    cidadeSlug: "santa-cruz-do-sul",
+    bairro: "Universitário",
     telefone: "(51) 3000-0011",
     whatsapp: "(51) 99000-0011",
-    produtos: [],
-  },
-  {
-    slug: "demo-exemplo-minimercado",
-    nome_fantasia: "Exemplo Minimercado",
-    razao_social: "Exemplo Minimercado Demonstração Ltda",
-    plano: "essencial",
-    destaque: false,
-    categoriaSlug: "alimentacao",
-    bairro: "Linha Santa Cruz",
-    telefone: "(51) 3000-0012",
-    whatsapp: "(51) 99000-0012",
-    produtos: [],
-  },
-  {
-    slug: "demo-modelo-salao-de-beleza",
-    nome_fantasia: "Modelo Salão de Beleza",
-    razao_social: "Modelo Salão de Beleza Demonstração Ltda",
-    plano: "essencial",
-    destaque: false,
-    categoriaSlug: "beleza-saude",
-    bairro: "Country",
-    telefone: "(51) 3000-0013",
-    whatsapp: "(51) 99000-0013",
-    produtos: [],
-  },
-  {
-    slug: "demo-exemplo-chaveiro",
-    nome_fantasia: "Exemplo Chaveiro 24h",
-    razao_social: "Exemplo Chaveiro Demonstração Ltda",
-    plano: "essencial",
-    destaque: false,
-    categoriaSlug: "servicos",
-    bairro: "Centro",
-    telefone: "(51) 3000-0014",
-    whatsapp: "(51) 99000-0014",
-    produtos: [],
-  },
-  {
-    slug: "demo-loja-modelo-materiais",
-    nome_fantasia: "Loja Modelo Materiais de Construção",
-    razao_social: "Loja Modelo Materiais de Construção Demonstração Ltda",
-    plano: "essencial",
-    destaque: false,
-    categoriaSlug: "casa-decoracao",
-    bairro: "Progresso",
-    telefone: "(51) 3000-0015",
-    whatsapp: "(51) 99000-0015",
-    produtos: [],
-  },
-  {
-    slug: "demo-demonstracao-lanchonete",
-    nome_fantasia: "Demonstração Lanchonete",
-    razao_social: "Demonstração Lanchonete Exemplo Ltda",
-    plano: "essencial",
-    destaque: false,
-    categoriaSlug: "alimentacao",
-    bairro: "Vila Formosa",
-    telefone: "(51) 3000-0016",
-    whatsapp: "(51) 99000-0016",
     produtos: [],
   },
   {
@@ -628,21 +434,140 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     plano: "essencial",
     destaque: false,
     categoriaSlug: "moda",
-    bairro: "Verena",
+    cidadeSlug: "vera-cruz",
+    bairro: "Linha Nova",
     telefone: "(51) 3000-0017",
     whatsapp: "(51) 99000-0017",
     produtos: [],
   },
   {
-    slug: "demo-modelo-lavanderia",
-    nome_fantasia: "Modelo Lavanderia",
-    razao_social: "Modelo Lavanderia Demonstração Ltda",
+    slug: "demo-exemplo-minimercado",
+    nome_fantasia: "Exemplo Minimercado",
+    razao_social: "Exemplo Minimercado Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "alimentacao",
+    cidadeSlug: "venancio-aires",
+    bairro: "Interior",
+    telefone: "(51) 3000-0012",
+    whatsapp: "(51) 99000-0012",
+    produtos: [],
+  },
+  {
+    slug: "demo-demonstracao-lanchonete",
+    nome_fantasia: "Demonstração Lanchonete",
+    razao_social: "Demonstração Lanchonete Exemplo Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "alimentacao",
+    cidadeSlug: "mato-leitao",
+    bairro: "Distrito",
+    telefone: "(51) 3000-0016",
+    whatsapp: "(51) 99000-0016",
+    produtos: [],
+  },
+  {
+    slug: "demo-modelo-salao-de-beleza",
+    nome_fantasia: "Modelo Salão de Beleza",
+    razao_social: "Modelo Salão de Beleza Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "beleza-saude",
+    cidadeSlug: "herveiras",
+    bairro: "Interior",
+    telefone: "(51) 3000-0013",
+    whatsapp: "(51) 99000-0013",
+    produtos: [],
+  },
+  {
+    slug: "demo-loja-modelo-materiais",
+    nome_fantasia: "Loja Modelo Materiais de Construção",
+    razao_social: "Loja Modelo Materiais de Construção Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "casa-decoracao",
+    cidadeSlug: "gramado-xavier",
+    bairro: "Distrito",
+    telefone: "(51) 3000-0015",
+    whatsapp: "(51) 99000-0015",
+    produtos: [],
+  },
+  {
+    slug: "demo-exemplo-chaveiro",
+    nome_fantasia: "Exemplo Chaveiro 24h",
+    razao_social: "Exemplo Chaveiro Demonstração Ltda",
     plano: "essencial",
     destaque: false,
     categoriaSlug: "servicos",
-    bairro: "Goiás",
-    telefone: "(51) 3000-0018",
-    whatsapp: "(51) 99000-0018",
+    cidadeSlug: "vale-do-sol",
+    bairro: "Distrito",
+    telefone: "(51) 3000-0014",
+    whatsapp: "(51) 99000-0014",
+    produtos: [],
+  },
+  {
+    slug: "demo-exemplo-informaticas",
+    nome_fantasia: "Exemplo Informática Bairro",
+    razao_social: "Exemplo Informática Bairro Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "tecnologia",
+    cidadeSlug: "vale-do-sol",
+    bairro: "Interior",
+    telefone: "(51) 3000-0020",
+    whatsapp: "(51) 99000-0020",
+    produtos: [],
+  },
+  {
+    slug: "demo-exemplo-auto-pecas",
+    nome_fantasia: "Exemplo Auto Peças",
+    razao_social: "Exemplo Auto Peças Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "automotivo",
+    cidadeSlug: "herveiras",
+    bairro: "Distrito",
+    telefone: "(51) 3000-0021",
+    whatsapp: "(51) 99000-0021",
+    produtos: [],
+  },
+  {
+    slug: "demo-modelo-papelaria-escolar",
+    nome_fantasia: "Modelo Papelaria Escolar",
+    razao_social: "Modelo Papelaria Escolar Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "papelaria",
+    cidadeSlug: "sinimbu",
+    bairro: "Distrito",
+    telefone: "(51) 3000-0022",
+    whatsapp: "(51) 99000-0022",
+    produtos: [],
+  },
+  {
+    slug: "demo-exemplo-relojoaria",
+    nome_fantasia: "Exemplo Relojoaria",
+    razao_social: "Exemplo Relojoaria Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "otica-relojoaria",
+    cidadeSlug: "gramado-xavier",
+    bairro: "Interior",
+    telefone: "(51) 3000-0023",
+    whatsapp: "(51) 99000-0023",
+    produtos: [],
+  },
+  {
+    slug: "demo-modelo-academia-bairro",
+    nome_fantasia: "Modelo Academia de Bairro",
+    razao_social: "Modelo Academia de Bairro Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "esportes",
+    cidadeSlug: "sinimbu",
+    bairro: "Interior",
+    telefone: "(51) 3000-0024",
+    whatsapp: "(51) 99000-0024",
     produtos: [],
   },
 ];

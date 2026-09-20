@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lojista.sindilojas-scs.com.br/sitemap.xml

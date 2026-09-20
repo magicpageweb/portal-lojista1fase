@@ -108,6 +108,16 @@ function LojistaDetail() {
       addressRegion: lojista.estado,
       postalCode: lojista.cep,
     } : undefined,
+    areaServed: lojista.cidade
+      ? {
+          "@type": "City",
+          name: lojista.cidade,
+          containedInPlace: {
+            "@type": "State",
+            name: lojista.estado || "RS",
+          },
+        }
+      : undefined,
     url: mostraCatalogo ? lojista.site ?? undefined : undefined,
   };
 

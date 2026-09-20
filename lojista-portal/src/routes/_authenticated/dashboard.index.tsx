@@ -46,6 +46,11 @@ function DashboardPage() {
     queryFn: async () => (await supabase.from("categorias").select("*").order("ordem")).data ?? [],
   });
 
+  const { data: cidades = [] } = useQuery({
+    queryKey: ["cidades"],
+    queryFn: async () => (await supabase.from("cidades").select("id, nome, uf, slug").order("ordem")).data ?? [],
+  });
+
   const { data: metrics } = useQuery({
     queryKey: ["my-metrics", lojista?.id],
     enabled: !!lojista?.id,
@@ -80,6 +85,11 @@ function DashboardPage() {
   const handleChange = (k: string, v: string) => {
     setForm({ ...form, [k]: formatLojistaField(k, v) });
     if (errors[k]) setErrors({ ...errors, [k]: "" });
+  };
+
+  const handlePatch = (patch: Partial<LojistaFormValues>) => {
+    setForm({ ...form, ...patch });
+    if (patch.cidade_id && errors.cidade) setErrors({ ...errors, cidade: "" });
   };
 
   const handleSave = async () => {
@@ -148,7 +158,9 @@ function DashboardPage() {
         form={form}
         errors={errors}
         cats={cats}
+        cidades={cidades}
         onChange={handleChange}
+        onPatch={handlePatch}
         uploadFolder={uploadFolder}
       />
     </DashboardShell>

@@ -31,6 +31,7 @@ export type LojistaFormValues = {
   cep?: string | null;
   bairro?: string | null;
   cidade?: string | null;
+  cidade_id?: string | null;
   estado?: string | null;
   logo_url?: string | null;
   capa_url?: string | null;

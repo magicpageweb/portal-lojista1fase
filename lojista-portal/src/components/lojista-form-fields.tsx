@@ -9,12 +9,16 @@ import type { LojistaFormValues, LojistaPlano } from "@/lib/lojista-form";
 export { ImageUploadField } from "@/components/image-upload-field";
 
 type Categoria = { id: string; nome: string };
+type CidadeOption = { id: string; nome: string; uf: string; slug?: string };
 
 type LojistaFormFieldsProps = {
   form: LojistaFormValues;
   errors: Record<string, string>;
   cats: Categoria[];
+  cidades: CidadeOption[];
   onChange: (key: string, value: string) => void;
+  /** Atualização em lote (ex.: cidade_id + cidade + estado). */
+  onPatch?: (patch: Partial<LojistaFormValues>) => void;
   /** Pasta no Storage (user.id ou lojista.id). */
   uploadFolder: string;
   /** Modo admin/gerente: slug read-only + seletor de plano. */
@@ -64,11 +68,25 @@ export function LojistaFormFields({
   form,
   errors,
   cats,
+  cidades,
   onChange,
+  onPatch,
   uploadFolder,
   staffMode = false,
   onPlanoChange,
 }: LojistaFormFieldsProps) {
+  const selectCidade = (id: string) => {
+    const c = cidades.find((x) => x.id === id);
+    if (onPatch && c) {
+      onPatch({ cidade_id: id, cidade: c.nome, estado: c.uf || "RS" });
+      return;
+    }
+    onChange("cidade_id", id);
+    if (c) {
+      onChange("cidade", c.nome);
+      onChange("estado", c.uf || "RS");
+    }
+  };
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <Card className="lg:col-span-2">
@@ -221,8 +239,23 @@ export function LojistaFormFields({
           </div>
           <Field label="Bairro" value={form.bairro} onChange={(v) => onChange("bairro", v)} error={errors.bairro} />
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Cidade" value={form.cidade} onChange={(v) => onChange("cidade", v)} error={errors.cidade} />
-            <Field label="Estado" value={form.estado} onChange={(v) => onChange("estado", v)} error={errors.estado} />
+            <div className="space-y-2">
+              <Label>Cidade</Label>
+              <Select value={(form.cidade_id as string) ?? ""} onValueChange={selectCidade}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a cidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cidades.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.cidade && <p className="text-xs font-medium text-destructive">{errors.cidade}</p>}
+            </div>
+            <Field label="Estado" value={form.estado ?? "RS"} onChange={(v) => onChange("estado", v)} error={errors.estado} />
           </div>
         </CardContent>
       </Card>

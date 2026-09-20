@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 const searchSchema = z.object({
   q: z.string().optional(),
   cat: z.string().optional(),
+  cidade: z.string().optional(),
 });
 
 type ViewMode = "grid" | "list";
@@ -101,6 +102,7 @@ function ListPage() {
   const search = useSearch({ from: "/lojistas/" });
   const [q, setQ] = useState(search.q ?? "");
   const [cat, setCat] = useState<string | undefined>(search.cat);
+  const [cidadeSlug, setCidadeSlug] = useState<string | undefined>(search.cidade);
   const [view, setView] = useState<ViewMode>("grid");
   const [sort, setSort] = useState<SortMode>("plano");
 
@@ -109,12 +111,17 @@ function ListPage() {
     queryFn: async () => (await supabase.from("categorias").select("*").order("ordem")).data ?? [],
   });
 
+  const { data: cidades = [] } = useQuery({
+    queryKey: ["cidades"],
+    queryFn: async () => (await supabase.from("cidades").select("id, nome, slug").order("ordem")).data ?? [],
+  });
+
   const { data: lojistas = [], isLoading } = useQuery({
     queryKey: ["lojistas", "all"],
     queryFn: async () => {
       const { data } = await supabase
         .from("lojistas")
-        .select("*, categorias(nome, slug, cor, icone)")
+        .select("*, categorias(nome, slug, cor, icone), cidades(nome, slug)")
         .eq("status", "ativo")
         .order("plano", { ascending: false })
         .order("nome_fantasia", { ascending: true });
@@ -126,17 +133,25 @@ function ListPage() {
     const query = q.trim().toLowerCase();
     const list = lojistas.filter((l: any) => {
       if (cat && l.categorias?.slug !== cat) return false;
+      if (cidadeSlug) {
+        const slug = l.cidades?.slug ?? null;
+        const texto = (l.cidade ?? "").toLowerCase();
+        const matchSlug = slug === cidadeSlug;
+        const matchTexto = cidades.find((c: any) => c.slug === cidadeSlug)?.nome?.toLowerCase() === texto;
+        if (!matchSlug && !matchTexto) return false;
+      }
       if (!query) return true;
       return (
         l.nome_fantasia?.toLowerCase().includes(query) ||
         l.descricao?.toLowerCase().includes(query) ||
         l.slogan?.toLowerCase().includes(query) ||
         l.bairro?.toLowerCase().includes(query) ||
+        l.cidade?.toLowerCase().includes(query) ||
         l.categorias?.nome?.toLowerCase().includes(query)
       );
     });
     return sortLojistas(list, sort);
-  }, [lojistas, q, cat, sort]);
+  }, [lojistas, q, cat, cidadeSlug, sort, cidades]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,27 +173,45 @@ function ListPage() {
       </section>
 
       <section className="container mx-auto px-4 py-10">
-        <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          <SlidersHorizontal className="h-4 w-4 shrink-0 text-muted-foreground" />
-          <Button
-            variant={cat ? "outline" : "default"}
-            size="sm"
-            onClick={() => setCat(undefined)}
-            className={cn("shrink-0", !cat && "gradient-gold text-secondary")}
-          >
-            Todas
-          </Button>
-          {cats.map((c: any) => (
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <SlidersHorizontal className="h-4 w-4 shrink-0 text-muted-foreground" />
             <Button
-              key={c.id}
-              variant={cat === c.slug ? "default" : "outline"}
+              variant={cat ? "outline" : "default"}
               size="sm"
-              onClick={() => setCat(c.slug)}
-              className={cn("shrink-0", cat === c.slug && "gradient-gold text-secondary")}
+              onClick={() => setCat(undefined)}
+              className={cn("shrink-0", !cat && "gradient-gold text-secondary")}
             >
-              {c.nome}
+              Todas
             </Button>
-          ))}
+            {cats.map((c: any) => (
+              <Button
+                key={c.id}
+                variant={cat === c.slug ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCat(c.slug)}
+                className={cn("shrink-0", cat === c.slug && "gradient-gold text-secondary")}
+              >
+                {c.nome}
+              </Button>
+            ))}
+          </div>
+          <Select
+            value={cidadeSlug ?? "todas"}
+            onValueChange={(v) => setCidadeSlug(v === "todas" ? undefined : v)}
+          >
+            <SelectTrigger className="h-9 w-full bg-background sm:w-[240px]" aria-label="Filtrar por cidade">
+              <SelectValue placeholder="Cidade" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas as cidades</SelectItem>
+              {cidades.map((c: any) => (
+                <SelectItem key={c.id} value={c.slug}>
+                  {c.nome}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {isLoading ? (
