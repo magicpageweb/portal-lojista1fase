@@ -34,13 +34,32 @@ function SobrePage() {
       <section className="container mx-auto max-w-3xl space-y-6 px-4 py-14 text-base leading-relaxed text-foreground/90">
         <p>
           O <strong>Sindilojas Vale do Rio Pardo</strong> é uma entidade patronal de classe, representante
-          do comércio varejista, atuando em oito municípios do Vale: Santa Cruz do Sul, Vera Cruz,
-          Venâncio Aires, Mato Leitão, Herveiras, Gramado Xavier, Vale do Sol e Sinimbu.
+          do comércio varejista, atuando em oito municípios do Vale:{" "}
+          {CIDADES_ATUACAO.map((c, i) => (
+            <span key={c.slug}>
+              {i > 0 && (i === CIDADES_ATUACAO.length - 1 ? " e " : ", ")}
+              <Link
+                to="/cidade/$slug"
+                params={{ slug: c.slug }}
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                {c.nome}
+              </Link>
+            </span>
+          ))}
+          .
         </p>
         <p>
-          A sede fica em <strong>Santa Cruz do Sul</strong>, com estrutura completa para o associado:
-          sala de reuniões, salão de festas e auditório — espaços que reforçam a vida associativa e
-          o relacionamento entre o comércio local.
+          A sede fica em{" "}
+          <Link
+            to="/cidade/$slug"
+            params={{ slug: "santa-cruz-do-sul" }}
+            className="font-medium text-primary underline-offset-2 hover:underline"
+          >
+            Santa Cruz do Sul
+          </Link>
+          , com estrutura completa para o associado: sala de reuniões, salão de festas e auditório —
+          espaços que reforçam a vida associativa e o relacionamento entre o comércio local.
         </p>
         <p>
           Aos associados, o Sindilojas oferece serviços e benefícios que fortalecem o dia a dia do

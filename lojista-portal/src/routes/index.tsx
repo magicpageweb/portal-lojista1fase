@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, MapPin, Search, ShieldCheck, Store, TrendingUp, Users } from "lucide-react";
@@ -9,7 +9,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { LojistaCard } from "@/components/lojista-card";
+import { LojistaGrid } from "@/components/lojista-grid";
+import { LojistaListRow } from "@/components/lojista-list-row";
+import {
+  LojistaBrowseControls,
+  LojistaSortViewControls,
+  type LojistaSortMode,
+  type LojistaViewMode,
+} from "@/components/lojista-browse-controls";
 import { useReveal } from "@/hooks/use-reveal";
+import { CIDADES_ATUACAO } from "@/lib/cidades";
+import { filterLojistasList, sortLojistasList } from "@/lib/lojista-browse";
 import { sortLojistasByPlano } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
@@ -34,6 +44,7 @@ function Home() {
       <SiteHeader />
       <Hero />
       <FeaturedStores />
+      <MunicipiosSection />
       <CategoriesGrid />
       <CtaJoin />
       <Counters />
@@ -205,42 +216,171 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
 }
 
 function FeaturedStores() {
+  const navigate = useNavigate();
+  const [cat, setCat] = useState<string | undefined>();
+  const [cidadeSlug, setCidadeSlug] = useState<string | undefined>();
+  const [view, setView] = useState<LojistaViewMode>("grid");
+  const [sort, setSort] = useState<LojistaSortMode>("relevancia");
+
+  const { data: cats = [] } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: async () => (await supabase.from("categorias").select("*").order("ordem")).data ?? [],
+  });
+
+  const { data: cidades = [] } = useQuery({
+    queryKey: ["cidades"],
+    queryFn: async () => (await supabase.from("cidades").select("id, nome, slug").order("ordem")).data ?? [],
+  });
+
   const { data: lojistas = [] } = useQuery({
-    queryKey: ["lojistas", "destaque"],
+    queryKey: ["lojistas", "home"],
     queryFn: async () => {
       const { data } = await supabase
         .from("lojistas")
-        .select("*, categorias(nome, slug, cor, icone)")
+        .select("*, categorias(nome, slug, cor, icone), cidades(nome, slug)")
         .eq("status", "ativo")
-        // enum: essencial < vitrine < destaque → descending = destaque, vitrine, essencial
         .order("plano", { ascending: false })
-        .order("nome_fantasia", { ascending: true })
-        .limit(8);
+        .order("nome_fantasia", { ascending: true });
       return sortLojistasByPlano(data ?? []);
     },
   });
+
+  const filtered = useMemo(
+    () =>
+      sortLojistasList(
+        filterLojistasList(lojistas, { cat, cidadeSlug, cidades }),
+        sort,
+      ),
+    [lojistas, cat, cidadeSlug, sort, cidades],
+  );
+
+  // Vitrine na Home: mostra até 8; filtros aplicados → leva a /lojistas com a mesma query
+  const hasFilter = !!cat || !!cidadeSlug;
+  const preview = hasFilter ? filtered : filtered.slice(0, 8);
+
+  const goToLojistas = (next?: { cat?: string; cidade?: string }) => {
+    navigate({
+      to: "/lojistas",
+      search: {
+        cat: next?.cat ?? cat,
+        cidade: next?.cidade ?? cidadeSlug,
+        sort: sort === "relevancia" ? undefined : sort,
+        view: view === "grid" ? undefined : view,
+      },
+    });
+  };
+
   const ref = useReveal<HTMLDivElement>();
   return (
     <section ref={ref} className="reveal container mx-auto px-4 py-16">
-      <div className="mb-10 flex items-end justify-between">
+      <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">Vitrine especial</Badge>
+          <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
+            Vitrine especial
+          </Badge>
           <h2 className="mt-3 font-display text-3xl font-extrabold md:text-4xl">Lojistas em destaque</h2>
           <p className="mt-1 text-muted-foreground">Conheça quem está movimentando o comércio local.</p>
         </div>
-        <Button asChild variant="outline" className="hidden md:inline-flex">
-          <Link to="/lojistas">Ver todos <ArrowRight className="ml-1 h-4 w-4" /></Link>
+        <Button asChild variant="outline" className="hidden shrink-0 md:inline-flex">
+          <Link to="/lojistas">
+            Ver todos <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
         </Button>
       </div>
-      {lojistas.length === 0 ? (
+
+      <LojistaBrowseControls
+        cats={cats}
+        cidades={cidades}
+        cat={cat}
+        cidadeSlug={cidadeSlug}
+        sort={sort}
+        view={view}
+        onCatChange={(slug) => {
+          setCat(slug);
+          goToLojistas({ cat: slug, cidade: cidadeSlug });
+        }}
+        onCidadeChange={(slug) => {
+          setCidadeSlug(slug);
+          goToLojistas({ cat, cidade: slug });
+        }}
+        onSortChange={setSort}
+        onViewChange={setView}
+        showSortAndView={false}
+        className="mb-4"
+      />
+
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted-foreground">
+          {hasFilter
+            ? `${filtered.length} resultado(s) — abrindo lista completa…`
+            : `${preview.length} de ${lojistas.length} lojista(s)`}
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <LojistaSortViewControls
+            sort={sort}
+            view={view}
+            onSortChange={setSort}
+            onViewChange={setView}
+          />
+        </div>
+      </div>
+
+      {preview.length === 0 ? (
         <EmptyState />
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {lojistas.map((l: any) => (
+      ) : view === "grid" ? (
+        <LojistaGrid count={preview.length}>
+          {preview.map((l: any) => (
             <LojistaCard key={l.id} lojista={l} />
+          ))}
+        </LojistaGrid>
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          {preview.map((l: any) => (
+            <LojistaListRow key={l.id} lojista={l} />
           ))}
         </div>
       )}
+
+      <div className="mt-8 text-center md:hidden">
+        <Button asChild variant="outline">
+          <Link to="/lojistas">
+            Ver todos <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+function MunicipiosSection() {
+  const ref = useReveal<HTMLDivElement>();
+  return (
+    <section ref={ref} className="reveal border-y border-border bg-muted/30 py-14">
+      <div className="container mx-auto px-4">
+        <div className="mb-8 text-center">
+          <Badge variant="outline" className="border-secondary/30 bg-secondary/5 text-secondary">
+            Vale do Rio Pardo
+          </Badge>
+          <h2 className="mt-3 font-display text-3xl font-extrabold md:text-4xl">Municípios atendidos</h2>
+          <p className="mt-2 text-muted-foreground">
+            Conheça o comércio associado em cada cidade de atuação do Sindilojas.
+          </p>
+        </div>
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {CIDADES_ATUACAO.map((c) => (
+            <li key={c.slug}>
+              <Link
+                to="/cidade/$slug"
+                params={{ slug: c.slug }}
+                className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium transition-colors hover:border-primary/40 hover:text-primary"
+              >
+                <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                {c.nome}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }
@@ -278,6 +418,7 @@ function CategoriesGrid() {
           <Link
             key={c.id}
             to="/lojistas"
+            search={{ cat: c.slug }}
             className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary hover:shadow-gold"
           >
             <div

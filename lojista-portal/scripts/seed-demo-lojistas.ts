@@ -1,5 +1,5 @@
 /**
- * Carga do catálogo de demonstração (24 lojistas fictícios).
+ * Carga do catálogo de demonstração (32 lojistas fictícios).
  *
  * SEGURANÇA
  *  - Usa a SUPABASE_SERVICE_ROLE_KEY, que ignora RLS. Rode apenas localmente,

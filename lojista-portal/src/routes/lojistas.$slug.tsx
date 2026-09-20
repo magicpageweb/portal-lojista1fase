@@ -243,10 +243,10 @@ function LojistaDetail() {
 
             {!mostraCatalogo && (
               <section className="rounded-2xl border border-dashed border-border bg-muted/30 px-5 py-8">
-                <h2 className="font-display text-xl font-bold">Plano Essencial</h2>
+                <h2 className="font-display text-xl font-bold">Perfil essencial</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Esta loja aparece com dados de contato e localização. Catálogo de produtos, galeria,
-                  site e redes sociais estão disponíveis nos planos Vitrine e Destaque.
+                  site e redes sociais estão disponíveis nas vitrines Destaque e Vitrine.
                 </p>
               </section>
             )}

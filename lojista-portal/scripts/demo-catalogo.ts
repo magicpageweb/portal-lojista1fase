@@ -12,7 +12,8 @@
  *  - slug com prefixo `demo-`.
  *
  * Distribuição (mín. 2 por categoria, ≥1 pago com foto em cada):
- *  4 destaque + 8 vitrine + 12 essencial = 24
+ *  8 destaque + 8 vitrine + 16 essencial = 32
+ *  4 lojas por cidade (1D + 1V + 2E) nas 8 cidades de atuação.
  */
 
 export const DEMO_CITY = "Santa Cruz do Sul";
@@ -100,7 +101,7 @@ const produtoExemplo = (nome: string, preco: number, imagem: number, ordem: numb
 });
 
 // ---------------------------------------------------------------------------
-// 4 destaque + 8 vitrine + 12 essencial = 24
+// 8 destaque + 8 vitrine + 16 essencial = 32 (4 por cidade: 1D+1V+2E)
 // ---------------------------------------------------------------------------
 
 export const DEMO_LOJISTAS: DemoLojista[] = [
@@ -569,5 +570,165 @@ export const DEMO_LOJISTAS: DemoLojista[] = [
     telefone: "(51) 3000-0024",
     whatsapp: "(51) 99000-0024",
     produtos: [],
+  },
+
+  // ======================= EXPANSÃO 32 (8 novas) =======================
+  // +1 essencial nas cidades que já tinham destaque
+  {
+    slug: "demo-exemplo-floricultura",
+    nome_fantasia: "Exemplo Floricultura",
+    razao_social: "Exemplo Floricultura Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "casa-decoracao",
+    cidadeSlug: "santa-cruz-do-sul",
+    bairro: "Avenida",
+    telefone: "(51) 3000-0025",
+    whatsapp: "(51) 99000-0025",
+    produtos: [],
+  },
+  {
+    slug: "demo-exemplo-pet-shop",
+    nome_fantasia: "Exemplo Pet Shop",
+    razao_social: "Exemplo Pet Shop Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "servicos",
+    cidadeSlug: "vera-cruz",
+    bairro: "Centro",
+    telefone: "(51) 3000-0026",
+    whatsapp: "(51) 99000-0026",
+    produtos: [],
+  },
+  {
+    slug: "demo-exemplo-farmacia",
+    nome_fantasia: "Exemplo Farmácia de Bairro",
+    razao_social: "Exemplo Farmácia Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "beleza-saude",
+    cidadeSlug: "venancio-aires",
+    bairro: "Centro",
+    telefone: "(51) 3000-0027",
+    whatsapp: "(51) 99000-0027",
+    produtos: [],
+  },
+  {
+    slug: "demo-exemplo-moveis",
+    nome_fantasia: "Exemplo Móveis e Colchões",
+    razao_social: "Exemplo Móveis Demonstração Ltda",
+    plano: "essencial",
+    destaque: false,
+    categoriaSlug: "casa-decoracao",
+    cidadeSlug: "mato-leitao",
+    bairro: "Centro",
+    telefone: "(51) 3000-0028",
+    whatsapp: "(51) 99000-0028",
+    produtos: [],
+  },
+  // +1 destaque nas cidades que ainda não tinham
+  {
+    slug: "demo-modelo-mercado-local",
+    nome_fantasia: "Modelo Mercado Local",
+    razao_social: "Modelo Mercado Local Demonstração Ltda",
+    plano: "destaque",
+    destaque: true,
+    categoriaSlug: "alimentacao",
+    cidadeSlug: "herveiras",
+    bairro: "Centro",
+    endereco: "Rua de Demonstração",
+    numero: "88",
+    cep: "96888-000",
+    telefone: "(51) 3000-0029",
+    whatsapp: "(51) 99000-0029",
+    site: "https://exemplo.demo.sindilojas.local",
+    instagram: "@modelomercadolocal",
+    pastaImagens: "demo-padaria-horizonte",
+    slogan: "Registro de demonstração — mercado de bairro",
+    descricao:
+      "Registro fictício usado para demonstrar o plano Destaque em Herveiras. Minimercado com hortifrúti e mercearia. Nenhum dado aqui corresponde a um associado real.",
+    produtos: [
+      produtoExemplo("Cesta Demonstração Básica", 49.9, 1, 1),
+      produtoExemplo("Kit Demonstração Limpeza", 32.0, 2, 2),
+      produtoExemplo("Pacote Demonstração Grãos", 18.5, 3, 3),
+    ],
+  },
+  {
+    slug: "demo-modelo-casa-presentes",
+    nome_fantasia: "Modelo Casa de Presentes",
+    razao_social: "Modelo Casa de Presentes Demonstração Ltda",
+    plano: "destaque",
+    destaque: true,
+    categoriaSlug: "moda",
+    cidadeSlug: "gramado-xavier",
+    bairro: "Centro",
+    endereco: "Rua de Demonstração",
+    numero: "210",
+    cep: "96875-000",
+    telefone: "(51) 3000-0030",
+    whatsapp: "(51) 99000-0030",
+    site: "https://exemplo.demo.sindilojas.local",
+    instagram: "@modelocasapresentes",
+    pastaImagens: "demo-boutique-luar",
+    slogan: "Registro de demonstração — presentes e moda",
+    descricao:
+      "Registro fictício usado para demonstrar o plano Destaque em Gramado Xavier. Loja de presentes e acessórios. Nenhum dado aqui corresponde a um associado real.",
+    produtos: [
+      produtoExemplo("Kit Demonstração Presente", 89.0, 1, 1),
+      produtoExemplo("Cachecol Demonstração", 59.0, 2, 2),
+      produtoExemplo("Bolsa Demonstração Pequena", 119.0, 3, 3),
+    ],
+  },
+  {
+    slug: "demo-modelo-studio-criativo",
+    nome_fantasia: "Modelo Estúdio Criativo",
+    razao_social: "Modelo Estúdio Criativo Demonstração Ltda",
+    plano: "destaque",
+    destaque: true,
+    categoriaSlug: "servicos",
+    cidadeSlug: "vale-do-sol",
+    bairro: "Centro",
+    endereco: "Rua de Demonstração",
+    numero: "55",
+    cep: "96878-000",
+    telefone: "(51) 3000-0031",
+    whatsapp: "(51) 99000-0031",
+    site: "https://exemplo.demo.sindilojas.local",
+    instagram: "@modeloestudiocriativo",
+    pastaImagens: "demo-pixel-byte",
+    slogan: "Registro de demonstração — estúdio e serviços",
+    descricao:
+      "Registro fictício usado para demonstrar o plano Destaque em Vale do Sol. Estúdio de criação e serviços digitais. Nenhum dado aqui corresponde a um associado real.",
+    produtos: [
+      produtoExemplo("Pacote Demonstração Identidade", 450.0, 1, 1),
+      produtoExemplo("Sessão Demonstração Foto", 280.0, 2, 2),
+      produtoExemplo("Arte Demonstração Social", 120.0, 3, 3),
+    ],
+  },
+  {
+    slug: "demo-modelo-bike-arena",
+    nome_fantasia: "Modelo Bike Arena",
+    razao_social: "Modelo Bike Arena Demonstração Ltda",
+    plano: "destaque",
+    destaque: true,
+    categoriaSlug: "esportes",
+    cidadeSlug: "sinimbu",
+    bairro: "Centro",
+    endereco: "Rua de Demonstração",
+    numero: "320",
+    cep: "96890-000",
+    telefone: "(51) 3000-0032",
+    whatsapp: "(51) 99000-0032",
+    site: "https://exemplo.demo.sindilojas.local",
+    instagram: "@modelobikearena",
+    pastaImagens: "demo-esportes-arena",
+    slogan: "Registro de demonstração — bikes e esportes",
+    descricao:
+      "Registro fictício usado para demonstrar o plano Destaque em Sinimbu. Bicicletas, acessórios e manutenção. Nenhum dado aqui corresponde a um associado real.",
+    produtos: [
+      produtoExemplo("Capacete Demonstração", 149.0, 1, 1),
+      produtoExemplo("Kit Demonstração Ferramentas", 89.0, 2, 2),
+      produtoExemplo("Luz Demonstração Bike", 69.0, 3, 3),
+    ],
   },
 ];

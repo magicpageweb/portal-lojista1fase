@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { LojistaCard } from "@/components/lojista-card";
+import { LojistaGrid } from "@/components/lojista-grid";
 import { Button } from "@/components/ui/button";
 import { CIDADES_ATUACAO, textoInstitucionalCidade } from "@/lib/cidades";
 import { sortLojistasByPlano } from "@/lib/format";
@@ -170,11 +171,11 @@ function CidadePage() {
             </div>
 
             {view === "grid" ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <LojistaGrid count={sorted.length}>
                 {sorted.map((l: any) => (
                   <LojistaCard key={l.id} lojista={l} />
                 ))}
-              </div>
+              </LojistaGrid>
             ) : (
               <div className="overflow-hidden rounded-xl border border-border bg-card">
                 {sorted.map((l: any) => {

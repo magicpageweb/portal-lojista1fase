@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Mail, MapPin, Phone, Shield } from "lucide-react";
 import { MAGICPAGE } from "@/config/site";
+import { CIDADES_ATUACAO } from "@/lib/cidades";
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-secondary/20 bg-secondary text-secondary-foreground">
-      <div className="container mx-auto grid gap-10 px-4 py-14 md:grid-cols-4">
+      <div className="container mx-auto grid gap-10 px-4 py-14 md:grid-cols-2 lg:grid-cols-5">
         <div>
           <Link to="/" className="inline-flex" aria-label="Sindilojas — início">
             <img
@@ -23,26 +24,71 @@ export function SiteFooter() {
         <div>
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">Portal</h4>
           <ul className="space-y-2 text-sm text-secondary-foreground/80">
-            <li><Link to="/lojistas" className="hover:text-primary">Lojistas associados</Link></li>
-            <li><Link to="/categorias" className="hover:text-primary">Categorias</Link></li>
-            <li><Link to="/auth" className="hover:text-primary">Área do lojista</Link></li>
+            <li>
+              <Link to="/lojistas" className="hover:text-primary">
+                Lojistas associados
+              </Link>
+            </li>
+            <li>
+              <Link to="/categorias" className="hover:text-primary">
+                Categorias
+              </Link>
+            </li>
+            <li>
+              <Link to="/sobre" className="hover:text-primary">
+                Sobre
+              </Link>
+            </li>
+            <li>
+              <Link to="/auth" className="hover:text-primary">
+                Área do lojista
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
+            Municípios atendidos
+          </h4>
+          <ul className="space-y-2 text-sm text-secondary-foreground/80">
+            {CIDADES_ATUACAO.map((c) => (
+              <li key={c.slug}>
+                <Link to="/cidade/$slug" params={{ slug: c.slug }} className="hover:text-primary">
+                  {c.nome}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">Sindicato</h4>
           <ul className="space-y-2 text-sm text-secondary-foreground/80">
-            <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Rua do Comércio, 100 — Centro</li>
-            <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> (00) 0000-0000</li>
-            <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> contato@sindilojas.org.br</li>
+            <li className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 shrink-0" /> Rua do Comércio, 100 — Centro
+            </li>
+            <li className="flex items-center gap-2">
+              <Phone className="h-4 w-4 shrink-0" /> (00) 0000-0000
+            </li>
+            <li className="flex items-center gap-2">
+              <Mail className="h-4 w-4 shrink-0" /> contato@sindilojas.org.br
+            </li>
           </ul>
         </div>
         <div>
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">Conecte-se</h4>
           <div className="flex gap-3">
-            <a href="#" aria-label="Instagram" className="grid h-10 w-10 place-items-center rounded-full bg-secondary-foreground/10 transition-colors hover:bg-primary hover:text-secondary">
+            <a
+              href="#"
+              aria-label="Instagram"
+              className="grid h-10 w-10 place-items-center rounded-full bg-secondary-foreground/10 transition-colors hover:bg-primary hover:text-secondary"
+            >
               <Instagram className="h-5 w-5" />
             </a>
-            <a href="#" aria-label="Facebook" className="grid h-10 w-10 place-items-center rounded-full bg-secondary-foreground/10 transition-colors hover:bg-primary hover:text-secondary">
+            <a
+              href="#"
+              aria-label="Facebook"
+              className="grid h-10 w-10 place-items-center rounded-full bg-secondary-foreground/10 transition-colors hover:bg-primary hover:text-secondary"
+            >
               <Facebook className="h-5 w-5" />
             </a>
           </div>
@@ -62,7 +108,7 @@ export function SiteFooter() {
               href={MAGICPAGE.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium hover:text-primary transition-colors"
+              className="font-medium transition-colors hover:text-primary"
             >
               {MAGICPAGE.name}
             </a>
