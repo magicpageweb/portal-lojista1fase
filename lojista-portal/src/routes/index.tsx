@@ -88,13 +88,21 @@ function Hero() {
           <Badge variant="outline" className="w-fit border-primary/40 bg-primary/10 text-primary">
             Portal oficial Sindilojas
           </Badge>
-          <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.08] sm:text-5xl md:text-6xl lg:text-[3.5rem]">
-            <span key={idx} className="block animate-fade-up">
-              <span className="block text-secondary-foreground">{ROTATING_HEADLINES[idx].top}</span>
-              <span className="block bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-                {ROTATING_HEADLINES[idx].bottom}
+          {/* Todos os títulos ocupam a mesma célula do grid: a altura segue o mais longo
+              e não varia quando o título ativo quebra em mais ou menos linhas. */}
+          <h1 className="mt-4 grid font-display text-4xl font-extrabold leading-[1.08] sm:text-5xl md:text-6xl lg:text-[3.5rem]">
+            {ROTATING_HEADLINES.map((h, i) => (
+              <span
+                key={i}
+                aria-hidden={i !== idx}
+                className={`col-start-1 row-start-1 block ${i === idx ? "animate-fade-up" : "opacity-0"}`}
+              >
+                <span className="block text-secondary-foreground">{h.top}</span>
+                <span className="block bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+                  {h.bottom}
+                </span>
               </span>
-            </span>
+            ))}
           </h1>
           <p className="mt-5 max-w-lg text-lg text-secondary-foreground/80">
             Conheça os lojistas associados, explore produtos exclusivos e fortaleça o comércio do seu bairro.
@@ -125,13 +133,19 @@ function Hero() {
 
           <div className="mt-6 flex flex-wrap gap-2 text-sm text-secondary-foreground/70">
             <span>Populares:</span>
-            {["Moda", "Alimentação", "Beleza", "Serviços"].map((tag) => (
+            {[
+              { label: "Moda", cat: "moda" },
+              { label: "Alimentação", cat: "alimentacao" },
+              { label: "Beleza", cat: "beleza-saude" },
+              { label: "Serviços", cat: "servicos" },
+            ].map((tag) => (
               <Link
-                key={tag}
+                key={tag.cat}
                 to="/lojistas"
+                search={{ cat: tag.cat }}
                 className="rounded-full border border-secondary-foreground/20 px-3 py-0.5 transition-colors hover:border-primary hover:text-primary"
               >
-                {tag}
+                {tag.label}
               </Link>
             ))}
           </div>
@@ -181,7 +195,7 @@ function Counters() {
     { icon: Users, label: "Associados", value: data?.lojistas ?? 0, color: "text-primary" },
     { icon: TrendingUp, label: "Produtos cadastrados", value: data?.produtos ?? 0, color: "text-secondary" },
     { icon: MapPin, label: "Bairros atendidos", value: data?.bairros ?? 0, color: "text-primary" },
-    { icon: ShieldCheck, label: "Verificados", value: data?.lojistas ?? 0, color: "text-secondary" },
+    { icon: ShieldCheck, label: "Municípios atendidos", value: CIDADES_ATUACAO.length, color: "text-secondary" },
   ];
   return (
     <section ref={ref} className="reveal container mx-auto px-4 py-16">

@@ -74,6 +74,11 @@ function LojistaDetail() {
     }
   }, [lojista?.id]);
 
+  // O head da rota só conhece o slug; ajusta o título quando os dados chegam.
+  useEffect(() => {
+    if (lojista?.nome_fantasia) document.title = `${lojista.nome_fantasia} | Portal do Lojista Sindilojas`;
+  }, [lojista?.nome_fantasia]);
+
   if (isLoading) return <div className="min-h-screen bg-background"><SiteHeader /><p className="container py-20 text-center">Carregando...</p></div>;
   if (!lojista) return <NotFoundView />;
 
@@ -168,9 +173,15 @@ function LojistaDetail() {
               <h1 className="mt-2 font-display text-3xl font-extrabold">{lojista.nome_fantasia}</h1>
               {lojista.slogan && <p className="mt-1 text-sm italic text-muted-foreground">"{lojista.slogan}"</p>}
 
-              <div className="mt-5 flex items-center gap-2 text-xs text-emerald-600">
-                <ShieldCheck className="h-4 w-4" /> Verificado pelo Sindilojas
-              </div>
+              {lojista.cnpj_verificado ? (
+                <div className="mt-5 flex items-center gap-2 text-xs text-emerald-600">
+                  <ShieldCheck className="h-4 w-4" /> Verificado pelo Sindilojas
+                </div>
+              ) : lojista.is_demo ? (
+                <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4" /> Registro demonstrativo
+                </div>
+              ) : null}
 
               <div className="mt-6 space-y-3">
                 {lojista.whatsapp && (
@@ -188,11 +199,18 @@ function LojistaDetail() {
                   </Button>
                 )}
                 {mostraCatalogo && lojista.site && (
-                  <Button asChild variant="outline" className="w-full" onClick={() => trackClick("clique_site")}>
-                    <a href={lojista.site} target="_blank" rel="noopener noreferrer">
-                      <Globe className="mr-2 h-4 w-4" /> Site
-                    </a>
-                  </Button>
+                  lojista.is_demo ? (
+                    // Lojas demo têm site fictício (.local): mostra o recurso sem link quebrado.
+                    <Button variant="outline" className="w-full" disabled>
+                      <Globe className="mr-2 h-4 w-4" /> Site (exemplo)
+                    </Button>
+                  ) : (
+                    <Button asChild variant="outline" className="w-full" onClick={() => trackClick("clique_site")}>
+                      <a href={lojista.site} target="_blank" rel="noopener noreferrer">
+                        <Globe className="mr-2 h-4 w-4" /> Site
+                      </a>
+                    </Button>
+                  )
                 )}
                 {mostraCatalogo && (lojista.instagram || lojista.facebook) && (
                   <div className="flex gap-2">
@@ -236,17 +254,26 @@ function LojistaDetail() {
               <section>
                 <h2 className="font-display text-2xl font-bold">Catálogo de produtos</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {produtos.map((p: any) => <ProdutoCard key={p.id} produto={p} />)}
+                  {produtos.map((p: any) => (
+                    <ProdutoCard
+                      key={p.id}
+                      produto={p}
+                      whatsapp={lojista.whatsapp}
+                      telefone={lojista.telefone}
+                      onContato={() => trackClick("clique_whatsapp")}
+                    />
+                  ))}
                 </div>
               </section>
             )}
 
             {!mostraCatalogo && (
               <section className="rounded-2xl border border-dashed border-border bg-muted/30 px-5 py-8">
-                <h2 className="font-display text-xl font-bold">Perfil essencial</h2>
+                <h2 className="font-display text-xl font-bold">Perfil Essencial</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Esta loja aparece com dados de contato e localização. Catálogo de produtos, galeria,
-                  site e redes sociais estão disponíveis nas vitrines Destaque e Vitrine.
+                  Presença institucional básica: dados de contato e localização. A página completa, com
+                  fotos, produtos, site e redes sociais, faz parte do plano Vitrine; o plano Destaque
+                  acrescenta prioridade visual e maior exposição no portal.
                 </p>
               </section>
             )}
@@ -275,9 +302,27 @@ function LojistaDetail() {
   );
 }
 
-function ProdutoCard({ produto }: { produto: any }) {
+function ProdutoCard({
+  produto,
+  whatsapp,
+  telefone,
+  onContato,
+}: {
+  produto: any;
+  whatsapp?: string | null;
+  telefone?: string | null;
+  onContato: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const img = publicImage(produto.foto_url);
+  const semPreco = produto.preco == null;
+  // Produto sem preço: "Consulte" leva ao WhatsApp da loja (ou ao telefone, se não houver).
+  const mensagem = `Olá! Vi o produto "${produto.nome}" no Portal do Lojista Sindilojas e gostaria de consultar o valor.`;
+  const contatoHref = whatsapp
+    ? `https://wa.me/55${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(mensagem)}`
+    : telefone
+      ? `tel:${telefone}`
+      : null;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -291,7 +336,11 @@ function ProdutoCard({ produto }: { produto: any }) {
           </div>
           <div className="p-3">
             <h4 className="line-clamp-1 font-semibold">{produto.nome}</h4>
-            {produto.preco != null && <p className="mt-0.5 font-display text-lg font-bold text-primary">{formatPrice(produto.preco)}</p>}
+            {semPreco ? (
+              <p className="mt-0.5 font-display text-lg font-bold text-secondary">Consulte</p>
+            ) : (
+              <p className="mt-0.5 font-display text-lg font-bold text-primary">{formatPrice(produto.preco)}</p>
+            )}
           </div>
         </button>
       </DialogTrigger>
@@ -302,8 +351,27 @@ function ProdutoCard({ produto }: { produto: any }) {
           </div>
           <div>
             <h3 className="font-display text-2xl font-bold">{produto.nome}</h3>
-            {produto.preco != null && <p className="mt-1 font-display text-3xl font-extrabold text-primary">{formatPrice(produto.preco)}</p>}
+            {semPreco ? (
+              <p className="mt-1 font-display text-2xl font-extrabold text-secondary">Consulte o valor</p>
+            ) : (
+              <p className="mt-1 font-display text-3xl font-extrabold text-primary">{formatPrice(produto.preco)}</p>
+            )}
             {produto.descricao && <p className="mt-4 whitespace-pre-line text-foreground/80">{produto.descricao}</p>}
+            {semPreco && contatoHref && (
+              <Button asChild className="mt-5 w-full bg-emerald-500 hover:bg-emerald-600" onClick={onContato}>
+                <a href={contatoHref} target={whatsapp ? "_blank" : undefined} rel="noopener noreferrer">
+                  {whatsapp ? (
+                    <>
+                      <MessageCircle className="mr-2 h-4 w-4" /> Consultar no WhatsApp
+                    </>
+                  ) : (
+                    <>
+                      <Phone className="mr-2 h-4 w-4" /> Ligar para a loja
+                    </>
+                  )}
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>

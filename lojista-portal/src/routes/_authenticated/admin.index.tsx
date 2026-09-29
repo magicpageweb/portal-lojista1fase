@@ -67,12 +67,17 @@ function AdminPage() {
     toast.success("Status atualizado");
     qc.invalidateQueries({ queryKey: ["admin-lojistas"] });
     qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    qc.invalidateQueries({ queryKey: ["lojistas"] });
   };
 
+  // O portal público usa `plano` para destacar; `destaque` é mantido em sincronia.
   const toggleDestaque = async (id: string, destaque: boolean) => {
-    const { error } = await supabase.from("lojistas").update({ destaque }).eq("id", id);
+    const plano = destaque ? "destaque" : "vitrine";
+    const { error } = await supabase.from("lojistas").update({ destaque, plano }).eq("id", id);
     if (error) return toast.error(error.message);
+    toast.success(destaque ? "Loja promovida a Destaque" : "Destaque removido (plano Vitrine)");
     qc.invalidateQueries({ queryKey: ["admin-lojistas"] });
+    qc.invalidateQueries({ queryKey: ["lojistas"] });
   };
 
   if (loading) return <DashboardShell title="Admin">Carregando...</DashboardShell>;

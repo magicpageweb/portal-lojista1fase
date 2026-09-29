@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { formatPrice, publicImage } from "@/lib/format";
+import { formatPrice, isPlanoPago, publicImage } from "@/lib/format";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/dashboard/produtos")({
@@ -26,11 +26,13 @@ function ProdutosPage() {
   const [open, setOpen] = useState(false);
 
   const { data: lojista } = useQuery({
-    queryKey: ["my-lojista", user?.id],
+    // Chave própria: "my-lojista" guarda o registro completo usado em /dashboard.
+    queryKey: ["my-lojista", "produtos", user?.id],
     enabled: !!user?.id,
     queryFn: async () =>
-      (await supabase.from("lojistas").select("id, nome_fantasia").eq("user_id", user!.id).maybeSingle()).data,
+      (await supabase.from("lojistas").select("id, nome_fantasia, plano").eq("user_id", user!.id).maybeSingle()).data,
   });
+  const podeCriarProduto = isPlanoPago(lojista?.plano);
 
   const { data: produtos = [] } = useQuery({
     queryKey: ["my-produtos", lojista?.id],
@@ -87,14 +89,26 @@ function ProdutosPage() {
     <DashboardShell title="Catálogo de produtos">
       <div className="mb-6 flex justify-between">
         <p className="text-muted-foreground">{produtos.length} produto(s)</p>
-        <Button onClick={openNew} className="gradient-gold text-secondary">
-          <Plus className="mr-1 h-4 w-4" /> Novo produto
-        </Button>
+        {podeCriarProduto && (
+          <Button onClick={openNew} className="gradient-gold text-secondary">
+            <Plus className="mr-1 h-4 w-4" /> Novo produto
+          </Button>
+        )}
       </div>
+
+      {!podeCriarProduto && (
+        <div className="mb-6 rounded-2xl border border-primary/30 bg-primary/5 p-5 text-sm">
+          <p className="font-semibold">Catálogo de produtos disponível nos planos Vitrine e Destaque</p>
+          <p className="mt-1 text-muted-foreground">
+            O plano Essencial oferece presença institucional básica (dados de contato e localização).
+            Para publicar fotos e produtos, fale com o Sindilojas sobre os planos Vitrine ou Destaque.
+          </p>
+        </div>
+      )}
 
       {produtos.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-12 text-center text-muted-foreground">
-          Nenhum produto cadastrado. Clique em &quot;Novo produto&quot;.
+          {podeCriarProduto ? <>Nenhum produto cadastrado. Clique em &quot;Novo produto&quot;.</> : "Nenhum produto cadastrado."}
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -107,8 +121,10 @@ function ProdutosPage() {
                 </div>
                 <CardContent className="p-4">
                   <h3 className="line-clamp-1 font-semibold">{p.nome}</h3>
-                  {p.preco != null && (
+                  {p.preco != null ? (
                     <p className="font-display text-lg font-bold text-primary">{formatPrice(p.preco)}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Sem preço (exibe “Consulte”)</p>
                   )}
                   <div className="mt-3 flex gap-2">
                     <Button size="sm" variant="outline" onClick={() => openEdit(p)} className="flex-1">
@@ -137,7 +153,7 @@ function ProdutosPage() {
                 <Input value={editing.nome} onChange={(e) => setEditing({ ...editing, nome: e.target.value })} />
               </div>
               <div className="space-y-2">
-                <Label>Preço (R$)</Label>
+                <Label>Preço (R$) — opcional</Label>
                 <Input
                   type="number"
                   step="0.01"
@@ -146,6 +162,9 @@ function ProdutosPage() {
                     setEditing({ ...editing, preco: e.target.value === "" ? null : Number(e.target.value) })
                   }
                 />
+                <p className="text-xs text-muted-foreground">
+                  Deixe em branco para exibir “Consulte” com botão de contato pelo WhatsApp.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label>Descrição</Label>

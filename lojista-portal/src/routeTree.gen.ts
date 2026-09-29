@@ -15,9 +15,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ApresentacaoRouteImport } from './routes/apresentacao'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CidadeSlugRouteImport } from './routes/cidade.$slug'
 import { Route as LojistasIndexRouteImport } from './routes/lojistas.index'
 import { Route as LojistasSlugRouteImport } from './routes/lojistas.$slug'
+import { Route as CidadeSlugRouteImport } from './routes/cidade.$slug'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedDashboardProdutosRouteImport } from './routes/_authenticated/dashboard.produtos'
@@ -51,11 +51,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CidadeSlugRoute = CidadeSlugRouteImport.update({
-  id: '/cidade/$slug',
-  path: '/cidade/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LojistasIndexRoute = LojistasIndexRouteImport.update({
   id: '/lojistas/',
   path: '/lojistas/',
@@ -64,6 +59,11 @@ const LojistasIndexRoute = LojistasIndexRouteImport.update({
 const LojistasSlugRoute = LojistasSlugRouteImport.update({
   id: '/lojistas/$slug',
   path: '/lojistas/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CidadeSlugRoute = CidadeSlugRouteImport.update({
+  id: '/cidade/$slug',
+  path: '/cidade/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -224,13 +224,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cidade/$slug': {
-      id: '/cidade/$slug'
-      path: '/cidade/$slug'
-      fullPath: '/cidade/$slug'
-      preLoaderRoute: typeof CidadeSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/lojistas/': {
       id: '/lojistas/'
       path: '/lojistas'
@@ -243,6 +236,13 @@ declare module '@tanstack/react-router' {
       path: '/lojistas/$slug'
       fullPath: '/lojistas/$slug'
       preLoaderRoute: typeof LojistasSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cidade/$slug': {
+      id: '/cidade/$slug'
+      path: '/cidade/$slug'
+      fullPath: '/cidade/$slug'
+      preLoaderRoute: typeof CidadeSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/': {

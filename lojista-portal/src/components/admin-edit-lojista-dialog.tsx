@@ -168,9 +168,10 @@ export function AdminEditLojistaDialog({ lojistaId, open, onOpenChange }: Props)
           <AlertDialogHeader>
             <AlertDialogTitle>Rebaixar plano?</AlertDialogTitle>
             <AlertDialogDescription>
-              Ao mudar de um plano superior para {pendingPlano === "essencial" ? "Essencial" : "Vitrine"},
-              catálogo de produtos, galeria, site e redes sociais deixarão de aparecer na página pública
-              (conforme as regras do plano). Confirma a alteração?
+              {pendingPlano === "essencial"
+                ? "Ao mudar para Essencial, catálogo de produtos, fotos, site e redes sociais deixarão de aparecer na página pública (conforme as regras do plano)."
+                : "Ao mudar de Destaque para Vitrine, a loja mantém a página completa, mas perde a prioridade visual e a maior exposição no portal."}{" "}
+              Confirma a alteração?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

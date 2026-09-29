@@ -13,6 +13,22 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+/** Admin/gerente entram direto no painel administrativo; lojistas, na própria loja. */
+async function destinoAposLogin(userId: string): Promise<"/admin" | "/dashboard"> {
+  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  return (data ?? []).some((r) => r.role === "admin" || r.role === "gerente") ? "/admin" : "/dashboard";
+}
+
+const AUTH_ERRORS: Record<string, string> = {
+  "Invalid login credentials": "E-mail ou senha incorretos.",
+  "Email not confirmed": "Confirme seu e-mail antes de entrar (verifique a caixa de entrada).",
+  "User already registered": "Este e-mail já está cadastrado. Use a aba Entrar.",
+};
+
+function traduzErro(message: string): string {
+  return AUTH_ERRORS[message] ?? message;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"signin" | "signup">("signin");
@@ -22,19 +38,23 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (data.session) navigate({ to: await destinoAposLogin(data.session.user.id) });
     });
   }, [navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setLoading(false);
+      return toast.error(traduzErro(error.message));
+    }
+    const destino = await destinoAposLogin(data.user.id);
     setLoading(false);
-    if (error) return toast.error(error.message);
     toast.success("Bem-vindo!");
-    navigate({ to: "/dashboard" });
+    navigate({ to: destino });
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -49,7 +69,7 @@ function AuthPage() {
       },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) return toast.error(traduzErro(error.message));
     toast.success("Conta criada! Faça login para continuar.");
     setTab("signin");
   };

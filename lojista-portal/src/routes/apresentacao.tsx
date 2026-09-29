@@ -56,12 +56,12 @@ const FAQ = [
     a: "O lojista cria uma conta, preenche os dados da loja, envia logo e capa, cadastra produtos ou serviços e aguarda a aprovação do Sindilojas. Tudo em poucos passos, pelo painel online.",
   },
   {
-    q: "Preciso pagar para ter vitrine no portal?",
-    a: "Não. A participação na vitrine digital é voltada ao associado Sindilojas, com foco em visibilidade para o comércio local — sem taxa extra para aparecer no catálogo.",
+    q: "Como funcionam os planos Essencial, Vitrine e Destaque?",
+    a: "É a proposta de implantação: Essencial oferece presença institucional básica; Vitrine traz a página completa, com fotos e produtos; Destaque acrescenta prioridade visual e maior exposição no portal. As condições de cada plano serão definidas pelo Sindilojas.",
   },
   {
     q: "O que aparece na página pública da minha loja?",
-    a: "Nome, descrição, categoria, logo, imagem de capa, produtos em grade, contatos, WhatsApp, site e redes sociais — tudo organizado para o consumidor encontrar seu negócio.",
+    a: "No Essencial: nome, categoria, descrição, contatos, WhatsApp e localização. No Vitrine e no Destaque: também logo, capa, fotos, catálogo de produtos, site e redes sociais.",
   },
   {
     q: "Posso atualizar produtos depois do cadastro?",

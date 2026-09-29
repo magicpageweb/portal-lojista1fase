@@ -63,14 +63,25 @@ export function SiteFooter() {
         <div>
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">Sindicato</h4>
           <ul className="space-y-2 text-sm text-secondary-foreground/80">
-            <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 shrink-0" /> Rua do Comércio, 100 — Centro
+            <li className="flex items-start gap-2">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                Rua Ernesto Alves, 714 — Centro
+                <br />
+                Santa Cruz do Sul / RS · 96810-144
+              </span>
             </li>
             <li className="flex items-center gap-2">
-              <Phone className="h-4 w-4 shrink-0" /> (00) 0000-0000
+              <Phone className="h-4 w-4 shrink-0" />
+              <a href="tel:+555130563500" className="hover:text-primary">
+                (51) 3056-3500
+              </a>
             </li>
             <li className="flex items-center gap-2">
-              <Mail className="h-4 w-4 shrink-0" /> contato@sindilojas.org.br
+              <Mail className="h-4 w-4 shrink-0" />
+              <a href="mailto:sindilojas@sindilojas-scs.com.br" className="break-all hover:text-primary">
+                sindilojas@sindilojas-scs.com.br
+              </a>
             </li>
           </ul>
         </div>
@@ -78,14 +89,18 @@ export function SiteFooter() {
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">Conecte-se</h4>
           <div className="flex gap-3">
             <a
-              href="#"
+              href="https://www.instagram.com/sindilojas.vrp/"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Instagram"
               className="grid h-10 w-10 place-items-center rounded-full bg-secondary-foreground/10 transition-colors hover:bg-primary hover:text-secondary"
             >
               <Instagram className="h-5 w-5" />
             </a>
             <a
-              href="#"
+              href="https://www.facebook.com/Sindilojas.VRP/"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Facebook"
               className="grid h-10 w-10 place-items-center rounded-full bg-secondary-foreground/10 transition-colors hover:bg-primary hover:text-secondary"
             >
@@ -94,7 +109,7 @@ export function SiteFooter() {
           </div>
           <div className="mt-6 flex items-center gap-2 rounded-lg border border-secondary-foreground/15 bg-secondary-foreground/5 px-3 py-2 text-xs">
             <Shield className="h-4 w-4 text-primary" />
-            <span>Lojistas verificados pelo sindicato</span>
+            <span>Comércio associado ao Sindilojas</span>
           </div>
         </div>
       </div>
