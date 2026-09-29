@@ -49,7 +49,9 @@ export function LojistaBrowseControls({
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        {/* Mobile: faixa única de borda a borda (compensa o px-4 do container), só rolagem lateral.
+            sm+: layout original. */}
+        <div className="-mx-4 flex flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 py-1 scrollbar-hide [-webkit-overflow-scrolling:touch] sm:mx-0 sm:px-0 sm:pb-1 sm:pt-0">
           <SlidersHorizontal className="h-4 w-4 shrink-0 text-muted-foreground" />
           <Button
             variant={cat ? "outline" : "default"}
